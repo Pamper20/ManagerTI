@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ManagerTI | Alpina</title>
+ 
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            alpina: {
+              primary: '#006298',
+              secondary: '#63666A',
+              dark: '#004369',
+              light: '#f4f7f9'
+            }
+          },
+          fontFamily: {
+            brand: ['Cinzel', 'serif'],
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .glass-card {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+    }
+  </style>
+</head>
+<body class="bg-alpina-light font-sans min-h-screen flex flex-col justify-between text-slate-800">
+
+  <!-- 1. PARTE SUPERIOR: Encabezado -->
+  <header class="bg-alpina-primary text-white shadow-lg border-b-4 border-alpina-secondary">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+     
+      <div class="flex items-center space-x-6">
+        <div class="bg-[#006298] p-1 rounded-xl shadow-md flex items-center justify-center overflow-hidden">
+          <img
+            src="/images/logo.png"
+            alt="Alpina Logo"
+            class="h-16 md:h-20 w-auto object-contain scale-105"
+            onerror="this.src='/images/logoAlpina_negativo.jpeg'"
+          >
+        </div>
+        <div class="h-12 w-0.5 bg-white/30 hidden sm:block"></div>
+        <div>
+          <h1 class="font-brand text-3xl md:text-4xl tracking-wider font-bold text-white drop-shadow-sm">ManagerTI</h1>
+          <p class="text-xs md:text-sm text-slate-200 tracking-widest uppercase font-medium">Gestión & Control de Tecnologías</p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-3 bg-alpina-dark/50 px-4 py-2 rounded-full border border-white/10">
+        <div id="status-indicator" class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></div>
+        <span id="status-text" class="text-xs font-medium tracking-wide">Sistema En Línea | Firebase Node.js</span>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- 2. PARTE CENTRAL: Panel de Navegación (Rutas apuntando a tu Servidor) -->
+  <main class="max-w-7xl mx-auto px-6 py-10 w-full flex-grow flex flex-col justify-center">
+   
+    <div class="text-center mb-10">
+      <h2 class="font-brand text-3xl font-bold text-alpina-primary mb-2">Módulos del Sistema</h2>
+      <p class="text-alpina-secondary text-sm max-w-lg mx-auto">Selecciona la operación que deseas gestionar dentro de la plataforma corporativa TI.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+     
+      <!-- Opción 1: Inventario -->
+      <a href="/api/inventory/view" class="glass-card group p-6 rounded-2xl shadow-md hover:shadow-xl border border-slate-200 hover:border-alpina-primary transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center">
+        <div class="w-16 h-16 bg-alpina-primary/10 rounded-2xl flex items-center justify-center text-alpina-primary group-hover:bg-alpina-primary group-hover:text-white transition-colors duration-300 mb-4 shadow-sm">
+          <i data-lucide="laptop" class="w-8 h-8"></i>
+        </div>
+        <h3 class="font-brand font-bold text-lg text-slate-800 mb-1 group-hover:text-alpina-primary">Inventario TI</h3>
+        <p class="text-xs text-alpina-secondary">Control de laptops, servidores y equipos en stock.</p>
+      </a>
+
+      <!-- Opción 2: Tickets de Soporte (Mesa de Ayuda) -->
+      <a href="/tickets.html" class="glass-card group p-6 rounded-2xl shadow-md hover:shadow-xl border border-slate-200 hover:border-alpina-primary transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center">
+        <div class="w-16 h-16 bg-alpina-primary/10 rounded-2xl flex items-center justify-center text-alpina-primary group-hover:bg-alpina-primary group-hover:text-white transition-colors duration-300 mb-4 shadow-sm">
+          <i data-lucide="life-buoy" class="w-8 h-8"></i>
+        </div>
+        <h3 class="font-brand font-bold text-lg text-slate-800 mb-1 group-hover:text-alpina-primary">Mesa de Ayuda</h3>
+        <p class="text-xs text-alpina-secondary">Gestión de tickets, atención e incidentes TI.</p>
+      </a>
+
+      <!-- Opción 3: Compras -->
+      <a href="#" class="glass-card group p-6 rounded-2xl shadow-md hover:shadow-xl border border-slate-200 hover:border-alpina-primary transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center">
+        <div class="w-16 h-16 bg-alpina-primary/10 rounded-2xl flex items-center justify-center text-alpina-primary group-hover:bg-alpina-primary group-hover:text-white transition-colors duration-300 mb-4 shadow-sm">
+          <i data-lucide="shopping-cart" class="w-8 h-8"></i>
+        </div>
+        <h3 class="font-brand font-bold text-lg text-slate-800 mb-1 group-hover:text-alpina-primary">Órdenes & Lotes</h3>
+        <p class="text-xs text-alpina-secondary">Ingreso de compras, garantías y proveedores.</p>
+      </a>
+
+      <!-- Opción 4: Reportes -->
+      <a href="#" class="glass-card group p-6 rounded-2xl shadow-md hover:shadow-xl border border-slate-200 hover:border-alpina-primary transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center">
+        <div class="w-16 h-16 bg-alpina-primary/10 rounded-2xl flex items-center justify-center text-alpina-primary group-hover:bg-alpina-primary group-hover:text-white transition-colors duration-300 mb-4 shadow-sm">
+          <i data-lucide="bar-chart-3" class="w-8 h-8"></i>
+        </div>
+        <h3 class="font-brand font-bold text-lg text-slate-800 mb-1 group-hover:text-alpina-primary">Reportes & KPIs</h3>
+        <p class="text-xs text-alpina-secondary">Métricas de consumo, SLA y trazabilidad.</p>
+      </a>
+
+    </div>
+
+  </main>
+
+  <!-- 3. PARTE INFERIOR: Panel de Resumen -->
+  <footer class="bg-white border-t border-slate-200 shadow-inner py-6">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="flex items-center justify-between mb-4">
+        <span class="text-xs font-bold text-alpina-secondary uppercase tracking-wider">Estado General en Tiempo Real</span>
+        <span id="last-updated" class="text-xs text-slate-400">Consultando Backend Node...</span>
+      </div>
+
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+        <div class="bg-alpina-light p-3 rounded-lg border border-slate-200">
+          <p class="text-xs text-alpina-secondary font-medium">Tickets Abiertos</p>
+          <p id="kpi-open" class="text-2xl font-bold text-alpina-primary">--</p>
+        </div>
+        <div class="bg-alpina-light p-3 rounded-lg border border-slate-200">
+          <p class="text-xs text-alpina-secondary font-medium">En Proceso</p>
+          <p id="kpi-process" class="text-2xl font-bold text-amber-600">--</p>
+        </div>
+        <div class="bg-alpina-light p-3 rounded-lg border border-slate-200">
+          <p class="text-xs text-alpina-secondary font-medium">SLA Vencido</p>
+          <p id="kpi-sla" class="text-2xl font-bold text-rose-600">--</p>
+        </div>
+        <div class="bg-alpina-light p-3 rounded-lg border border-slate-200">
+          <p class="text-xs text-alpina-secondary font-medium">Alertas Stock Bajo</p>
+          <p id="kpi-alerts" class="text-2xl font-bold text-alpina-secondary">--</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+
+    // Consulta de KPIs desde ticketController.js
+    async function fetchMetrics() {
+      try {
+        const response = await fetch('/api/tickets/metrics');
+        if (response.ok) {
+          const data = await response.json();
+          document.getElementById('kpi-open').innerText = data.abiertos || 0;
+          document.getElementById('kpi-process').innerText = data.en_proceso || 0;
+          document.getElementById('kpi-sla').innerText = data.sla_vencido || 0;
+          document.getElementById('kpi-alerts').innerText = data.alertas_stock || 0;
+          
+          const now = new Date();
+          document.getElementById('last-updated').innerText = `Actualizado: ${now.toLocaleTimeString()}`;
+        }
+      } catch (err) {
+        console.error("Error al conectar con la API de tickets:", err);
+      }
+    }
+
+    fetchMetrics();
+    setInterval(fetchMetrics, 15000); // Refresca métricas cada 15 seg
+  </script>
+</body>
+</html>

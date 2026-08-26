@@ -1,0 +1,10 @@
+// routes/inventoryRoutes.js
+const express = require('express');
+const router = express.Router();
+const inventoryController = require('../controllers/inventoryController');
+
+router.get('/', inventoryController.getInventory);
+router.get('/alerts', inventoryController.getAlerts);
+router.post('/movement', inventoryController.registerMovement);
+
+module.exports = router;
