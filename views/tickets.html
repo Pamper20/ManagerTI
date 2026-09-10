@@ -312,6 +312,14 @@
       });
 
       cargarTickets();
+
+      // Escuchador global para cerrar modales al presionar la tecla Escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          cerrarModalCrear();
+          cerrarModalDetalle();
+        }
+      });
     });
 
     function abrirModalCrear() {
@@ -333,22 +341,24 @@
       try {
         const res = await fetch('/api/tickets');
         let tickets = await res.json();
+        
+        console.log("Tickets cargados desde Firestore:", tickets);
 
         if (!Array.isArray(tickets) || tickets.length === 0) {
           tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-8 text-center text-slate-400">No hay tickets registrados.</td></tr>`;
           return;
         }
 
-        // 1. Asignar correlativo INMUTABLE
+        // 1. Asignar correlativo INMUTABLE basado en el índice original
         listaTicketsCache = tickets.map((t, index) => {
           const num = String(index + 1).padStart(3, '0');
           return { ...t, correlativo: `TK-${num}` };
         });
 
-        // 2. Invertir lista para mostrar más reciente arriba
+        // 2. Invertir la lista para mostrar el ticket más reciente arriba
         const ticketsParaMostrar = [...listaTicketsCache].reverse();
 
-        // 3. Renderizar la tabla
+        // 3. Renderizar filas en la tabla
         tbody.innerHTML = ticketsParaMostrar.map(t => {
           const usuario = t.usuario || t.nombre || t.solicitante || 'N/A';
           const asunto = t.asunto || t.titulo || 'Sin asunto';
@@ -380,7 +390,8 @@
         }).join('');
 
       } catch (err) {
-        console.error("Error cargando tickets:", err);
+        console.error("Error al cargar tickets:", err);
+        tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-8 text-center text-red-500 font-medium">Error al cargar la información desde el servidor.</td></tr>`;
       }
     }
 
@@ -429,14 +440,14 @@
         <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${obtenerBadge(estado)}">${estado}</span>
       `;
 
-      // Texto de estado bajo el timer
+      // Texto explicativo bajo el cronómetro
       let textoEstado = `Estado actual: ${estado}`;
       if (estado === 'En Proceso') {
         textoEstado += estaCorriendo ? ' (Corriendo 🟢)' : ' (Pausado ⏸)';
       }
       document.getElementById('estadoCronometroTexto').innerText = textoEstado;
 
-      // Actualizar Botón "En Proceso"
+      // Botón "En Proceso"
       const btnEnProcesoIcon = document.getElementById('btnEnProcesoIcon');
       const btnEnProcesoText = document.getElementById('btnEnProcesoText');
       const btnEnProceso = document.getElementById('btnEnProceso');
@@ -500,7 +511,7 @@
       const estaCorriendo = ticketSeleccionado.cronometroActivo === true;
 
       const payload = {
-        estado: 'En Proceso', // El estado siempre se mantiene en "En Proceso"
+        estado: 'En Proceso',
         tiempoTrabajadoSegundos: tiempoAcumuladoActual,
         cronometroActivo: !estaCorriendo,
         ultimaAccionTiempo: !estaCorriendo ? Date.now() : null

@@ -69,7 +69,7 @@
     </div>
   </header>
 
-  <!-- 2. PARTE CENTRAL: Panel de Navegación (Rutas apuntando a tu Servidor) -->
+  <!-- 2. PARTE CENTRAL: Panel de Navegación (Rutas corregidas) -->
   <main class="max-w-7xl mx-auto px-6 py-10 w-full flex-grow flex flex-col justify-center">
    
     <div class="text-center mb-10">
@@ -79,8 +79,8 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
      
-      <!-- Opción 1: Inventario -->
-      <a href="/api/inventory/view" class="glass-card group p-6 rounded-2xl shadow-md hover:shadow-xl border border-slate-200 hover:border-alpina-primary transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center">
+      <!-- Opción 1: Inventario TI (CORREGIDO) -->
+      <a href="/inventario.html" class="glass-card group p-6 rounded-2xl shadow-md hover:shadow-xl border border-slate-200 hover:border-alpina-primary transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center">
         <div class="w-16 h-16 bg-alpina-primary/10 rounded-2xl flex items-center justify-center text-alpina-primary group-hover:bg-alpina-primary group-hover:text-white transition-colors duration-300 mb-4 shadow-sm">
           <i data-lucide="laptop" class="w-8 h-8"></i>
         </div>
@@ -97,8 +97,8 @@
         <p class="text-xs text-alpina-secondary">Gestión de tickets, atención e incidentes TI.</p>
       </a>
 
-      <!-- Opción 3: Compras -->
-      <a href="#" class="glass-card group p-6 rounded-2xl shadow-md hover:shadow-xl border border-slate-200 hover:border-alpina-primary transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center">
+      <!-- Opción 3: Compras (CORREGIDO) -->
+      <a href="/ordenes_compra.html" class="glass-card group p-6 rounded-2xl shadow-md hover:shadow-xl border border-slate-200 hover:border-alpina-primary transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center">
         <div class="w-16 h-16 bg-alpina-primary/10 rounded-2xl flex items-center justify-center text-alpina-primary group-hover:bg-alpina-primary group-hover:text-white transition-colors duration-300 mb-4 shadow-sm">
           <i data-lucide="shopping-cart" class="w-8 h-8"></i>
         </div>
@@ -151,16 +151,20 @@
   <script>
     lucide.createIcons();
 
-    // Consulta de KPIs desde ticketController.js
+    // Consulta de KPIs desde backend
     async function fetchMetrics() {
       try {
-        const response = await fetch('/api/tickets/metrics');
+        const response = await fetch('/api/tickets');
         if (response.ok) {
-          const data = await response.json();
-          document.getElementById('kpi-open').innerText = data.abiertos || 0;
-          document.getElementById('kpi-process').innerText = data.en_proceso || 0;
-          document.getElementById('kpi-sla').innerText = data.sla_vencido || 0;
-          document.getElementById('kpi-alerts').innerText = data.alertas_stock || 0;
+          const tickets = await response.json();
+          
+          const abiertos = tickets.filter(t => t.estado === 'Abierto').length;
+          const enProceso = tickets.filter(t => t.estado === 'En Proceso').length;
+          
+          document.getElementById('kpi-open').innerText = abiertos;
+          document.getElementById('kpi-process').innerText = enProceso;
+          document.getElementById('kpi-sla').innerText = 0;
+          document.getElementById('kpi-alerts').innerText = 0;
           
           const now = new Date();
           document.getElementById('last-updated').innerText = `Actualizado: ${now.toLocaleTimeString()}`;

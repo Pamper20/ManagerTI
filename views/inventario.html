@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inventario TI | ManagerTI</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- SheetJS para leer Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            alpina: {
+              primary: '#006298',
+              secondary: '#63666A',
+              dark: '#004369',
+              light: '#f4f7f9'
+            }
+          },
+          fontFamily: {
+            brand: ['Cinzel', 'serif'],
+            sans: ['Inter', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-alpina-light font-sans min-h-screen flex flex-col justify-between text-slate-800">
+
+  <!-- Encabezado con Logo Local y Línea Plateada Brillante -->
+  <header class="bg-alpina-primary text-white shadow-lg border-b-4 border-alpina-secondary">
+    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <div class="flex items-center space-x-6">
+        <div class="bg-[#006298] p-1 rounded-xl shadow-md flex items-center justify-center overflow-hidden">
+          <img
+            src="/images/logo.png"
+            alt="Alpina Logo"
+            class="h-16 md:h-20 w-auto object-contain scale-105"
+            onerror="this.src='/images/logoAlpina_negativo.jpeg'"
+          >
+        </div>
+
+        <!-- Línea plateada con brillo -->
+        <div class="h-12 w-[2px] bg-gradient-to-b from-transparent via-slate-300 to-transparent shadow-[0_0_8px_rgba(255,255,255,0.8)] hidden sm:block"></div>
+
+        <div>
+          <h1 class="font-brand text-2xl md:text-3xl font-bold tracking-wider text-white drop-shadow-sm">ManagerTI</h1>
+          <p class="text-xs md:text-sm text-slate-200 tracking-wider font-medium">Inventario & Activos TI</p>
+        </div>
+      </div>
+
+      <!-- Navegación -->
+      <div class="flex items-center gap-3">
+        <a href="/" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium text-xs rounded-lg transition-colors flex items-center gap-2">
+          <i data-lucide="home" class="w-4 h-4"></i> Dashboard
+        </a>
+        <a href="/tickets.html" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium text-xs rounded-lg transition-colors flex items-center gap-2">
+          <i data-lucide="life-buoy" class="w-4 h-4"></i> Tickets
+        </a>
+        <a href="/ordenes_compra.html" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium text-xs rounded-lg transition-colors flex items-center gap-2">
+          <i data-lucide="shopping-cart" class="w-4 h-4"></i> Órdenes de Compra
+        </a>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="max-w-7xl mx-auto px-6 py-8 w-full flex-grow">
+    
+    <!-- Barra Superior de Acciones -->
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+      <div>
+        <h3 class="text-lg font-bold text-alpina-primary">Gestión de Activos TI</h3>
+        <p class="text-xs text-alpina-secondary">Monitoreo de equipos, asignaciones y licencias asociadas.</p>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <!-- Limpiar datos viejos/erróneos -->
+        <button onclick="vaciarInventario()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg shadow transition-colors flex items-center gap-2">
+          <i data-lucide="trash-2" class="w-4 h-4"></i> Limpiar Inventario
+        </button>
+
+        <!-- Input Oculto para Cargar Excel -->
+        <input type="file" id="excel-input" accept=".xlsx, .xls" class="hidden" onchange="procesarExcel(event)">
+        
+        <button onclick="document.getElementById('excel-input').click()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition-colors flex items-center gap-2">
+          <i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Importar Excel
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabla de Inventario -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm border-collapse">
+          <thead>
+            <tr class="bg-slate-100 border-b border-slate-200 text-slate-700 text-xs uppercase font-semibold">
+              <th class="p-4">Tipo / Nombre</th>
+              <th class="p-4">Marca & Modelo</th>
+              <th class="p-4">N° Serie</th>
+              <th class="p-4">Usuario / Sede</th>
+              <th class="p-4">Ubicación</th>
+              <th class="p-4">Estado</th>
+              <th class="p-4 text-center">Detalles & Licencias</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-activos" class="divide-y divide-slate-100 text-slate-600">
+            <tr>
+              <td colspan="7" class="p-6 text-center text-slate-400">Cargando inventario desde Firestore...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    lucide.createIcons();
+
+    // 1. Cargar activos desde el servidor Node.js
+    async function cargarActivos() {
+      try {
+        const res = await fetch('/api/activos');
+        const activos = await res.json();
+        
+        const tbody = document.getElementById('tabla-activos');
+        if (!activos || activos.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No hay activos registrados. Presiona "Importar Excel" para cargar tu plantilla.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = activos.map((item, idx) => `
+          <tr class="hover:bg-slate-50 transition-colors">
+            <td class="p-4 font-semibold text-slate-800">
+              ${item.tipo || 'Equipo'}
+              <div class="text-xs font-normal text-slate-400">${item.nombreEquipo || ''}</div>
+            </td>
+            <td class="p-4">${item.marca || ''} ${item.modelo || ''}</td>
+            <td class="p-4 font-mono text-xs">${item.numeroSerie || 'SIN SERIE'}</td>
+            <td class="p-4">
+              <div class="font-medium text-slate-700">${item.usuarioAsignado || 'Sin Asignar'}</div>
+              <div class="text-xs text-slate-400">${item.sede || item.empresa || ''}</div>
+            </td>
+            <td class="p-4">${item.ubicacion || 'Almacén'}</td>
+            <td class="p-4">
+              <span class="px-2.5 py-1 text-xs rounded-full font-medium ${
+                item.estado === 'OPERATIVO' || item.estado === 'Disponible' ? 'bg-emerald-100 text-emerald-700' :
+                item.estado === 'DETERIORO' || item.estado === 'BAJA' ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600'
+              }">
+                ${item.estado || 'OPERATIVO'}
+              </span>
+            </td>
+            <td class="p-4 text-center">
+              <button onclick="toggleDetalle('${idx}')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs rounded font-medium transition-colors">
+                Ver Ficha
+              </button>
+            </td>
+          </tr>
+          <!-- Ficha Desplegable de Licencias y Credenciales -->
+          <tr id="detalle-${idx}" class="hidden bg-slate-50 border-b border-slate-200">
+            <td colspan="7" class="p-4 text-xs text-slate-600">
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-lg border border-slate-200">
+                <div>
+                  <p class="font-bold text-alpina-primary mb-1">Credenciales Locales:</p>
+                  <p><strong>Usuario:</strong> ${item.usuarioLocal || 'Sin Dato'}</p>
+                  <p><strong>Contraseña:</strong> ${item.credencialesLocal || 'Sin Dato'}</p>
+                  <p><strong>Observaciones:</strong> ${item.observaciones || 'Ninguna'}</p>
+                </div>
+                <div>
+                  <p class="font-bold text-alpina-primary mb-1">Licencias Registradas:</p>
+                  <p><strong>Windows:</strong> ${item.licencias?.windows || 'N/A'}</p>
+                  <p><strong>Office:</strong> ${item.licencias?.office || 'N/A'}</p>
+                  <p><strong>AutoCAD:</strong> ${item.licencias?.autocad || 'N/A'}</p>
+                </div>
+                <div>
+                  <p class="font-bold text-alpina-primary mb-1">Información Adicional:</p>
+                  <p><strong>Valor Compra:</strong> ${item.valorCompra || 'N/A'}</p>
+                  <p><strong>Adquisición:</strong> ${item.fechaAdquisicion || 'N/A'}</p>
+                  <p><strong>Segundo Uso:</strong> ${item.segundoUso || 'NO'}</p>
+                </div>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+
+        lucide.createIcons();
+      } catch (err) {
+        console.error('Error al obtener activos:', err);
+      }
+    }
+
+    // Toggle para mostrar/ocultar credenciales y licencias
+    function toggleDetalle(idx) {
+      const el = document.getElementById(`detalle-${idx}`);
+      if (el) el.classList.toggle('hidden');
+    }
+
+    // 2. Eliminar todo el inventario anterior
+    async function vaciarInventario() {
+      if (!confirm('¿Deseas eliminar todos los registros actuales para subir la lista limpia desde el Excel?')) return;
+
+      try {
+        const res = await fetch('/api/activos/vaciar', { method: 'DELETE' });
+        const result = await res.json();
+        if (res.ok) {
+          alert(result.mensaje);
+          cargarActivos();
+        } else {
+          alert('Error: ' + result.error);
+        }
+      } catch (err) {
+        console.error('Error:', err);
+      }
+    }
+
+    // 3. Importar Excel a Firestore
+    function procesarExcel(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = async function(e) {
+        const base64File = btoa(
+          new Uint8Array(e.target.result)
+            .reduce((data, byte) => data + String.fromCharCode(byte), '')
+        );
+
+        try {
+          const res = await fetch('/api/activos/cargar-excel', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ base64File })
+          });
+          const result = await res.json();
+
+          if (res.ok) {
+            alert(result.mensaje);
+            cargarActivos();
+          } else {
+            alert('Error: ' + result.error);
+          }
+        } catch (error) {
+          console.error('Error al enviar Excel:', error);
+          alert('Error al procesar el archivo Excel');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    cargarActivos();
+  </script>
+</body>
+</html>

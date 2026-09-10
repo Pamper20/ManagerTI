@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Órdenes de Compra - ManagerTI</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Paleta Corporativa Oficial Pantone -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              blue: '#00537E',
+              blueHover: '#003E5F',
+              grayDark: '#63666A',
+              silver: '#D1D5DB',
+              bgLight: '#F8FAFC',
+              cardLight: '#FFFFFF'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- JSZip para empaquetar Cotización y OC -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body class="bg-brand-bgLight text-slate-800 min-h-screen flex flex-col">
+
+  <!-- HEADER PRINCIPAL -->
+  <header class="bg-brand-blue text-white py-4 px-8 shadow-md">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      
+      <!-- LOGO CORPORATIVO -->
+      <div class="flex items-center gap-4">
+        <div class="bg-white/10 p-2 rounded-xl border border-white/20 backdrop-blur-sm flex items-center justify-center">
+          <img src="images/logo.png" alt="Logo ManagerTI" class="h-10 w-auto object-contain">
+        </div>
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight">ManagerTI</h1>
+          <p class="text-blue-200 text-xs">Gestión de Compras y Proveedores TI</p>
+        </div>
+      </div>
+
+      <!-- NAVEGACIÓN ENTRE MÓDULOS -->
+      <div class="flex items-center gap-3">
+        <button onclick="abrirModalNuevaOC()" class="px-4 py-2.5 bg-white text-brand-blue font-semibold text-sm rounded-xl shadow hover:bg-blue-50 transition flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Nueva Orden de Compra
+        </button>
+        <a href="/inventario.html" class="px-4 py-2.5 bg-brand-blueHover hover:bg-slate-900 text-white text-sm rounded-xl border border-blue-400/30 transition flex items-center gap-2">
+          Inventario TI
+        </a>
+        <a href="/tickets.html" class="px-4 py-2.5 bg-brand-blueHover hover:bg-slate-900 text-white text-sm rounded-xl border border-blue-400/30 transition flex items-center gap-2">
+          Mesa de Tickets
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div class="w-full h-1 bg-gradient-to-r from-gray-300 via-slate-400 to-gray-300 shadow-sm"></div>
+
+  <!-- TABLA PRINCIPAL DE ÓRDENES DE COMPRA -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8">
+    <div class="bg-brand-cardLight border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+        <h2 class="text-sm font-bold text-brand-grayDark uppercase tracking-wider">Historial de Órdenes de Compra y Cotizaciones</h2>
+        <span id="totalOCLabel" class="text-xs bg-brand-blue text-white px-2.5 py-1 rounded-full font-mono font-bold">0 Órdenes</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead class="bg-slate-100 text-brand-grayDark uppercase text-xs font-bold tracking-wider border-b border-slate-200">
+            <tr>
+              <th class="px-6 py-4">N° Orden</th>
+              <th class="px-6 py-4">Proveedor / RUC</th>
+              <th class="px-6 py-4">Monto (USD)</th>
+              <th class="px-6 py-4">Fecha Emisión</th>
+              <th class="px-6 py-4">Estado</th>
+              <th class="px-6 py-4 text-center">Documentos</th>
+              <th class="px-6 py-4 text-center">Acción</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-oc-body" class="divide-y divide-slate-200 text-sm text-slate-700">
+            <tr>
+              <td colspan="7" class="px-6 py-8 text-center text-slate-400">Cargando órdenes de compra...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <!-- MODAL 1: REGISTRAR NUEVA ORDEN DE COMPRA -->
+  <div id="modalNuevaOC" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl">
+      <div class="px-6 py-4 bg-brand-blue text-white flex justify-between items-center">
+        <h3 class="text-lg font-bold">Ingresar Orden de Compra y Cotización</h3>
+        <button onclick="cerrarModalNuevaOC()" class="text-blue-200 hover:text-white text-xl">&times;</button>
+      </div>
+
+      <form id="formNuevaOC" onsubmit="guardarOC(event)" class="p-6 space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-brand-grayDark uppercase tracking-wider mb-1">Número de OC</label>
+            <input type="text" id="ocNumero" required placeholder="Ej. OC-2026-089" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-slate-800 focus:outline-none focus:border-brand-blue transition text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-brand-grayDark uppercase tracking-wider mb-1">Proveedor</label>
+            <input type="text" id="ocProveedor" required placeholder="Ej. TechSolutions S.A.C." class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-slate-800 focus:outline-none focus:border-brand-blue transition text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-brand-grayDark uppercase tracking-wider mb-1">RUC Proveedor</label>
+            <input type="text" id="ocRuc" placeholder="20123456789" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-slate-800 focus:outline-none focus:border-brand-blue transition text-sm">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-brand-grayDark uppercase tracking-wider mb-1">Monto Total ($ USD)</label>
+            <input type="number" step="0.01" id="ocMonto" required placeholder="1200.00" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-slate-800 focus:outline-none focus:border-brand-blue transition text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-brand-grayDark uppercase tracking-wider mb-1">Fecha Emisión</label>
+            <input type="date" id="ocFecha" required class="w-full bg-slate-50 border border-slate-300 rounded-xl px-4 py-2 text-slate-800 focus:outline-none focus:border-brand-blue transition text-sm">
+          </div>
+        </div>
+
+        <!-- SECCIÓN DE ARCHIVOS PDF / ZIP -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+          <div>
+            <label class="block text-xs font-semibold text-brand-grayDark uppercase mb-1">Cotización del Proveedor (PDF)</label>
+            <input type="file" id="ocCotizacionPdf" accept=".pdf" required class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-brand-grayDark uppercase mb-1">Orden de Compra Firmada (PDF)</label>
+            <input type="file" id="ocFirmadaPdf" accept=".pdf" class="w-full bg-white border border-slate-300 rounded-lg p-1.5 text-xs">
+          </div>
+        </div>
+
+        <!-- DETALLE DE PRODUCTOS A INGRESAR -->
+        <div class="border-t border-slate-200 pt-3">
+          <label class="block text-xs font-bold text-brand-grayDark uppercase tracking-wider mb-2">Ítem a Comprar</label>
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+            <input type="text" id="itemTipo" placeholder="Tipo (ej. Laptop)" required class="bg-slate-50 border rounded-lg px-3 py-1.5 text-xs">
+            <input type="text" id="itemMarca" placeholder="Marca (ej. Lenovo)" required class="bg-slate-50 border rounded-lg px-3 py-1.5 text-xs">
+            <input type="text" id="itemModelo" placeholder="Modelo (ej. ThinkPad T14)" required class="bg-slate-50 border rounded-lg px-3 py-1.5 text-xs">
+            <input type="number" id="itemCantidad" placeholder="Cantidad" min="1" required class="bg-slate-50 border rounded-lg px-3 py-1.5 text-xs">
+          </div>
+        </div>
+
+        <div id="msgProcesando" class="text-xs text-brand-blue font-semibold hidden">⚡ Comprimiendo archivos en ZIP...</div>
+
+        <div class="pt-4 flex justify-end gap-3 border-t border-slate-200">
+          <button type="button" onclick="cerrarModalNuevaOC()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 text-sm rounded-xl">Cancelar</button>
+          <button type="submit" id="btnGuardarOC" class="px-5 py-2 bg-brand-blue hover:bg-brand-blueHover text-white text-sm font-semibold rounded-xl transition">Guardar OC</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL 2: RECEPCIONAR MERCADERÍA E INGRESAR SERIES AL INVENTARIO -->
+  <div id="modalRecepcion" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+    <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="px-6 py-4 bg-brand-blue text-white flex justify-between items-center">
+        <div>
+          <h3 class="text-lg font-bold">Recepción de Activos e Ingreso de Series</h3>
+          <p id="recOcNumero" class="text-xs text-blue-200 font-mono mt-0.5"></p>
+        </div>
+        <button onclick="cerrarModalRecepcion()" class="text-blue-200 hover:text-white text-xl">&times;</button>
+      </div>
+
+      <div class="p-6 overflow-y-auto space-y-4 flex-1">
+        <p class="text-xs text-slate-600">
+          Ingrese los números de serie individuales de cada equipo recibido para registrarlos en el inventario activo.
+        </p>
+
+        <div id="contenedorSeries" class="space-y-3">
+          <!-- Se autogenera dinámicamente según la cantidad de ítems de la OC -->
+        </div>
+      </div>
+
+      <div class="px-6 py-4 bg-slate-50 border-t border-slate-200 flex justify-end gap-3">
+        <button onclick="cerrarModalRecepcion()" class="px-4 py-2 bg-slate-200 hover:bg-slate-300 text-slate-700 text-sm font-semibold rounded-xl">Cancelar</button>
+        <button onclick="confirmarRecepcion()" class="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold rounded-xl transition">Confirmar y Enviar a Inventario</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let ordenesCache = [];
+    let ocSeleccionada = null;
+
+    document.addEventListener('DOMContentLoaded', cargarOrdenesCompra);
+
+    async function cargarOrdenesCompra() {
+      const tbody = document.getElementById('tabla-oc-body');
+      try {
+        const res = await fetch('/api/ordenes-compra');
+        ordenesCache = await res.json();
+
+        document.getElementById('totalOCLabel').innerText = `${ordenesCache.length} Órdenes`;
+
+        if (!Array.isArray(ordenesCache) || ordenesCache.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="7" class="px-6 py-8 text-center text-slate-400">No hay órdenes de compra registradas.</td></tr>`;
+          return;
+        }
+
+        tbody.innerHTML = ordenesCache.map(oc => {
+          const docId = oc.id || oc.docId;
+          const itemsArr = typeof oc.items === 'string' ? JSON.parse(oc.items || '[]') : (oc.items || []);
+          return `
+            <tr class="hover:bg-slate-50 transition border-b border-slate-100">
+              <td class="px-6 py-4 font-mono font-bold text-xs text-brand-blue">${oc.numeroOC}</td>
+              <td class="px-6 py-4">
+                <div class="font-medium text-slate-900">${oc.proveedor}</div>
+                <div class="text-xs text-slate-400 font-mono">${oc.rucProveedor || 'Sin RUC'}</div>
+              </td>
+              <td class="px-6 py-4 font-mono font-bold text-slate-800">$${Number(oc.montoTotalUSD || 0).toFixed(2)}</td>
+              <td class="px-6 py-4 text-xs text-slate-600">${oc.fechaEmision ? oc.fechaEmision.split('T')[0] : 'N/A'}</td>
+              <td class="px-6 py-4">
+                <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${oc.estado === 'Recepcionada' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-amber-100 text-amber-700 border border-amber-200'}">
+                  ${oc.estado || 'Registrada'}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-center">
+                ${oc.pdfCotizacionZip ? `<button onclick="descargarArchivosOC('${docId}')" class="px-3 py-1 bg-slate-800 hover:bg-slate-900 text-white text-xs rounded-lg shadow">Descargar ZIP</button>` : '<span class="text-xs text-slate-400">Sin archivos</span>'}
+              </td>
+              <td class="px-6 py-4 text-center">
+                ${oc.estado !== 'Recepcionada' ? `
+                  <button onclick="abrirModalRecepcion('${docId}')" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition">
+                    Recepcionar Equipos
+                  </button>
+                ` : `<span class="text-xs text-slate-400 font-medium">Completada</span>`}
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error("Error cargando órdenes de compra:", err);
+      }
+    }
+
+    function abrirModalNuevaOC() {
+      document.getElementById('modalNuevaOC').classList.remove('hidden');
+      document.getElementById('modalNuevaOC').classList.add('flex');
+    }
+
+    function cerrarModalNuevaOC() {
+      document.getElementById('modalNuevaOC').classList.add('hidden');
+      document.getElementById('modalNuevaOC').classList.remove('flex');
+      document.getElementById('formNuevaOC').reset();
+    }
+
+    async function guardarOC(e) {
+      e.preventDefault();
+      const btn = document.getElementById('btnGuardarOC');
+      const msg = document.getElementById('msgProcesando');
+      btn.disabled = true;
+      msg.classList.remove('hidden');
+
+      try {
+        const fileCot = document.getElementById('ocCotizacionPdf').files[0];
+        const fileFirm = document.getElementById('ocFirmadaPdf').files[0];
+
+        const zip = new JSZip();
+        if (fileCot) zip.file(`Cotizacion_${fileCot.name}`, fileCot);
+        if (fileFirm) zip.file(`OC_Firmada_${fileFirm.name}`, fileFirm);
+
+        const zipBase64 = await zip.generateAsync({ type: 'base64', compression: 'DEFLATE' });
+
+        const nuevoItem = {
+          tipo: document.getElementById('itemTipo').value,
+          marca: document.getElementById('itemMarca').value,
+          modelo: document.getElementById('itemModelo').value,
+          cantidad: parseInt(document.getElementById('itemCantidad').value)
+        };
+
+        const payload = {
+          numeroOC: document.getElementById('ocNumero').value,
+          proveedor: document.getElementById('ocProveedor').value,
+          rucProveedor: document.getElementById('ocRuc').value,
+          montoTotalUSD: parseFloat(document.getElementById('ocMonto').value),
+          fechaEmision: document.getElementById('ocFecha').value,
+          estado: 'Registrada',
+          pdfCotizacionZip: zipBase64,
+          pdfOCZip: null,
+          items: [nuevoItem]
+        };
+
+        const res = await fetch('/api/ordenes-compra', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (res.ok) {
+          cerrarModalNuevaOC();
+          cargarOrdenesCompra();
+        } else {
+          alert("Error guardando la Orden de Compra.");
+        }
+      } catch (err) {
+        console.error("Error al guardar OC:", err);
+      } finally {
+        btn.disabled = false;
+        msg.classList.add('hidden');
+      }
+    }
+
+    function abrirModalRecepcion(id) {
+      ocSeleccionada = ordenesCache.find(o => (o.id === id || o.docId === id));
+      if (!ocSeleccionada) return;
+
+      document.getElementById('recOcNumero').innerText = `Orden: ${ocSeleccionada.numeroOC} - ${ocSeleccionada.proveedor}`;
+      const contenedor = document.getElementById('contenedorSeries');
+      contenedor.innerHTML = '';
+
+      const itemsArr = typeof ocSeleccionada.items === 'string' ? JSON.parse(ocSeleccionada.items || '[]') : (ocSeleccionada.items || []);
+
+      itemsArr.forEach(item => {
+        for (let i = 1; i <= item.cantidad; i++) {
+          contenedor.innerHTML += `
+            <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl flex flex-col md:flex-row gap-3 items-center">
+              <span class="text-xs font-bold text-brand-blue w-28">${item.tipo} #${i}</span>
+              <input type="text" data-tipo="${item.tipo}" data-marca="${item.marca}" data-modelo="${item.modelo}" class="input-serie bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs flex-1" placeholder="Ingrese N° de Serie (SN) *" required>
+              <input type="text" class="input-codigo bg-white border border-slate-300 rounded-lg px-3 py-1.5 text-xs w-36" placeholder="Cód Activo (opcional)">
+            </div>
+          `;
+        }
+      });
+
+      document.getElementById('modalRecepcion').classList.remove('hidden');
+      document.getElementById('modalRecepcion').classList.add('flex');
+    }
+
+    function cerrarModalRecepcion() {
+      document.getElementById('modalRecepcion').classList.add('hidden');
+      document.getElementById('modalRecepcion').classList.remove('flex');
+    }
+
+    async function confirmarRecepcion() {
+      if (!ocSeleccionada) return;
+
+      const seriesInputs = document.querySelectorAll('.input-serie');
+      const codigosInputs = document.querySelectorAll('.input-codigo');
+
+      const activosAIngresar = [];
+
+      for (let i = 0; i < seriesInputs.length; i++) {
+        const serieVal = seriesInputs[i].value.trim();
+        if (!serieVal) return alert(`Por favor ingrese el número de serie para todos los ítems.`);
+
+        activosAIngresar.push({
+          tipo: seriesInputs[i].dataset.tipo,
+          marca: seriesInputs[i].dataset.marca,
+          modelo: seriesInputs[i].dataset.modelo,
+          numeroSerie: serieVal,
+          codigoActivo: codigosInputs[i].value.trim() || `MNG-${Date.now().toString().slice(-4)}-${i+1}`,
+          ubicacion: 'Almacén Principal',
+          estado: 'Disponible',
+          ordenCompra: ocSeleccionada.numeroOC
+        });
+      }
+
+      const docId = ocSeleccionada.id || ocSeleccionada.docId;
+
+      try {
+        const res = await fetch(`/api/ordenes-compra/${docId}/recepcionar`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ activosAIngresar })
+        });
+
+        if (res.ok) {
+          alert('✓ Equipos ingresados al inventario correctamente.');
+          cerrarModalRecepcion();
+          cargarOrdenesCompra();
+        } else {
+          alert('Error al recepcionar los activos.');
+        }
+      } catch (err) {
+        console.error('Error enviando recepción:', err);
+      }
+    }
+
+    function descargarArchivosOC(id) {
+      const oc = ordenesCache.find(o => (o.id === id || o.docId === id));
+      if (!oc || !oc.pdfCotizacionZip) return;
+
+      const link = document.createElement('a');
+      link.href = 'data:application/zip;base64,' + oc.pdfCotizacionZip;
+      link.download = `Documentos_${oc.numeroOC}.zip`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  </script>
+</body>
+</html>
