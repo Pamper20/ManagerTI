@@ -47,6 +47,11 @@ app.get('/tickets.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'views', 'tickets.html'));
 });
 
+// NUEVA RUTA: Sirve el módulo de Reportes & KPIs
+app.get('/reportes.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'views', 'reportes.html'));
+});
+
 
 // ==========================================
 // 2. API: TICKETS DE SOPORTE

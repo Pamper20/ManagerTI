@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reportes & KPIs - ManagerTI</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Chart.js para Gráficos Interactivos -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- html2pdf.js para exportación a PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <!-- SheetJS / XLSX para exportación a Excel -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- HEADER CORPORATIVO ESTÁNDAR - ALPINA -->
+  <header class="bg-[#00537E] text-white shadow-lg border-b-4 border-[#003E5F] sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <!-- LADO IZQUIERDO: Logo + Separador Plateado Brilliant + Título -->
+      <div class="flex items-center space-x-5 w-full md:w-auto justify-start">
+        <div class="bg-[#006298] p-1.5 rounded-xl shadow-md flex items-center justify-center overflow-hidden shrink-0">
+          <img
+            src="/images/logo.png"
+            alt="Alpina Logo"
+            class="h-14 md:h-16 w-auto object-contain"
+            onerror="this.src='/images/logoAlpina_negativo.jpeg'"
+          >
+        </div>
+
+        <!-- Separador Metálico -->
+        <div class="h-10 w-[2px] bg-gradient-to-b from-slate-400 via-slate-100 to-slate-400 shadow-[0_0_8px_rgba(255,255,255,0.8)] hidden sm:block"></div>
+
+        <!-- Identificador de la Aplicación y Página Activa -->
+        <div class="text-left">
+          <div class="flex items-center space-x-2">
+            <h1 class="font-sans text-2xl md:text-3xl tracking-wider font-bold text-white drop-shadow-sm">ManagerTI</h1>
+            <span class="text-xs bg-slate-200/20 text-slate-100 px-2.5 py-1 rounded border border-white/20 font-medium tracking-wide">
+              Reportes & KPIs
+            </span>
+          </div>
+          <p class="text-[10px] text-slate-200 tracking-widest uppercase font-medium mt-0.5">Gestión & Control de Tecnologías</p>
+        </div>
+      </div>
+
+      <!-- LADO DERECHO: Navegación -->
+      <div class="flex items-center space-x-3 w-full md:w-auto justify-end flex-wrap">
+        
+        <a href="/ordenes_compra.html" class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white font-medium text-xs rounded-xl border border-white/20 transition flex items-center gap-1.5">
+          <i data-lucide="shopping-cart" class="w-4 h-4"></i>
+          <span>Órdenes de Compra</span>
+        </a>
+
+        <a href="/inventario.html" class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white font-medium text-xs rounded-xl border border-white/20 transition flex items-center gap-1.5">
+          <i data-lucide="boxes" class="w-4 h-4"></i>
+          <span>Inventario TI</span>
+        </a>
+
+        <a href="/tickets.html" class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white font-medium text-xs rounded-xl border border-white/20 transition flex items-center gap-1.5">
+          <i data-lucide="ticket" class="w-4 h-4"></i>
+          <span>Mesa de Tickets</span>
+        </a>
+
+        <a href="/" class="bg-white/10 hover:bg-white/20 text-white p-2 rounded-xl transition border border-white/20 flex items-center justify-center" title="Volver al inicio">
+          <i data-lucide="home" class="w-4 h-4"></i>
+        </a>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main id="reporteArea" class="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8 space-y-6">
+
+    <!-- FILTROS SUPERIORES Y EXPORTACIÓN -->
+    <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div class="flex items-center gap-3 w-full sm:w-auto">
+        <i data-lucide="filter" class="w-5 h-5 text-[#00537E]"></i>
+        <select id="filtroPeriodo" onchange="actualizarMetricas()" class="bg-slate-50 border border-slate-300 text-xs font-semibold rounded-xl px-3 py-2 text-slate-700 focus:outline-none focus:border-[#00537E]">
+          <option value="mes">Este Mes (Septiembre 2026)</option>
+          <option value="trimestre">T3 2026</option>
+          <option value="anio">Año 2026</option>
+        </select>
+        <select id="filtroSede" onchange="actualizarMetricas()" class="bg-slate-50 border border-slate-300 text-xs font-semibold rounded-xl px-3 py-2 text-slate-700 focus:outline-none focus:border-[#00537E]">
+          <option value="todas">Todas las Sedes</option>
+          <option value="planta">Planta Principal</option>
+          <option value="admin">Oficinas Administrativas</option>
+          <option value="logistica">Centro de Distribución</option>
+        </select>
+      </div>
+
+      <div class="flex items-center gap-2 w-full sm:w-auto justify-end" data-html2canvas-ignore="true">
+        <button onclick="exportarExcel()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-xl transition flex items-center gap-1.5 shadow-sm">
+          <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+          <span>Exportar Excel</span>
+        </button>
+        <button id="btnPdf" onclick="exportarPDF()" class="px-3.5 py-2 bg-slate-800 hover:bg-slate-900 text-white text-xs font-semibold rounded-xl transition flex items-center gap-1.5 shadow-sm">
+          <i data-lucide="file-text" class="w-4 h-4"></i>
+          <span>Reporte PDF</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- TARJETAS DE KPIS PRINCIPALES -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- KPI 1: Cumplimiento SLA -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Cumplimiento SLA</p>
+          <h3 id="kpiSla" class="text-2xl font-extrabold text-slate-800 mt-1">94.2%</h3>
+          <span id="kpiSlaTrend" class="text-[11px] font-semibold text-emerald-600 flex items-center gap-0.5 mt-1">
+            <i data-lucide="trending-up" class="w-3 h-3"></i> +2.1% vs mes anterior
+          </span>
+        </div>
+        <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+          <i data-lucide="shield-check" class="w-6 h-6"></i>
+        </div>
+      </div>
+
+      <!-- KPI 2: Tiempo de Resolución (MTTR) -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Tiempo Prom. Cierre</p>
+          <h3 id="kpiMttr" class="text-2xl font-extrabold text-slate-800 mt-1">2.4 hrs</h3>
+          <span class="text-[11px] font-semibold text-emerald-600 flex items-center gap-0.5 mt-1">
+            <i data-lucide="clock" class="w-3 h-3"></i> Objetivo: &lt; 4 hrs
+          </span>
+        </div>
+        <div class="p-3 bg-blue-50 text-[#00537E] rounded-xl">
+          <i data-lucide="timer" class="w-6 h-6"></i>
+        </div>
+      </div>
+
+      <!-- KPI 3: Inversión en Compras -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Inversión Equipos (USD)</p>
+          <h3 id="kpiInversion" class="text-2xl font-extrabold text-slate-800 mt-1">$45,280</h3>
+          <span id="kpiInversionCant" class="text-[11px] font-semibold text-slate-500 mt-1 block">12 Órdenes de Compra</span>
+        </div>
+        <div class="p-3 bg-amber-50 text-amber-600 rounded-xl">
+          <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+        </div>
+      </div>
+
+      <!-- KPI 4: Uso de Inventario -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div>
+          <p class="text-xs font-bold text-slate-400 uppercase tracking-wider">Activos en Uso</p>
+          <h3 id="kpiActivos" class="text-2xl font-extrabold text-slate-800 mt-1">88%</h3>
+          <span id="kpiActivosRatio" class="text-[11px] font-semibold text-slate-500 mt-1 block">312 Asignados / 355 Total</span>
+        </div>
+        <div class="p-3 bg-purple-50 text-purple-600 rounded-xl">
+          <i data-lucide="laptop" class="w-6 h-6"></i>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SECCIÓN DE GRÁFICOS -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Gráfico 1: Consumo / Gasto Mensual (2 Columnas) -->
+      <div class="lg:col-span-2 bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+            <i data-lucide="bar-chart-3" class="w-4 h-4 text-[#00537E]"></i>
+            Métricas de Consumo e Inversión TI (USD)
+          </h3>
+          <span class="text-xs text-slate-400 font-mono">Consolidado 2026</span>
+        </div>
+        <div class="h-64 relative">
+          <canvas id="chartInversion"></canvas>
+        </div>
+      </div>
+
+      <!-- Gráfico 2: Tickets por Categoría/Estado (1 Columna) -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+            <i data-lucide="pie-chart" class="w-4 h-4 text-[#00537E]"></i>
+            Distribución de Tickets
+          </h3>
+        </div>
+        <div class="h-64 relative flex items-center justify-center">
+          <canvas id="chartTickets"></canvas>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SECCIÓN DE TRAZABILIDAD Y AUDITORÍA DE ACTIVOS -->
+    <div class="bg-white border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
+      <div class="p-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row justify-between sm:items-center gap-3">
+        <div>
+          <h3 class="text-sm font-bold text-slate-700 uppercase tracking-wider flex items-center gap-2">
+            <i data-lucide="history" class="w-4 h-4 text-[#00537E]"></i>
+            Trazabilidad e Historial del Ciclo de Vida de Activos
+          </h3>
+          <p id="subtituloCantActivos" class="text-xs text-slate-400 mt-0.5">Rastreabilidad desde la Orden de Compra hasta el usuario final y soportes</p>
+        </div>
+        <div class="relative" data-html2canvas-ignore="true">
+          <input type="text" id="busquedaTrazable" onkeyup="filtrarTrazabilidad()" placeholder="Buscar por Serie, Activo, OC o Usuario..." class="bg-white border border-slate-300 text-xs rounded-xl pl-8 pr-4 py-2 w-full sm:w-64 focus:outline-none focus:border-[#00537E]">
+          <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5"></i>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table id="tablaTrazabilidadElemento" class="w-full text-left border-collapse">
+          <thead class="bg-slate-100 text-slate-600 uppercase text-xs font-bold tracking-wider border-b border-slate-200">
+            <tr>
+              <th class="px-6 py-3">Cód. Activo / Serie</th>
+              <th class="px-6 py-3">Equipo / Modelo</th>
+              <th class="px-6 py-3">Origen (N° OC)</th>
+              <th class="px-6 py-3">Usuario Asignado</th>
+              <th class="px-6 py-3 text-center">Incidencias</th>
+              <th class="px-6 py-3 text-center">Estado Ciclo</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-trazabilidad" class="divide-y divide-slate-200 text-xs text-slate-700">
+            <!-- Se renderiza dinámicamente con JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    let chartInversionInstance = null;
+    let chartTicketsInstance = null;
+
+    // BASE DE DATOS DE PRUEBA COMPLETA DE ACTIVOS
+    const equiposBaseDatos = [
+      { id: "MNG-8841-1", sn: "LNV-9928112", nombre: "Laptop Lenovo ThinkPad T14", specs: "Intel i7 / 16GB RAM", oc: "OC-2026-089", usuario: "Carlos Mendoza", area: "Jefatura Logística", tickets: "1 Ticket", estado: "Asignado", colorEstado: "bg-emerald-100 text-emerald-700" },
+      { id: "MNG-7712-2", sn: "Dell-554109", nombre: "Monitor Dell 27\" P2722H", specs: "FHD IPS", oc: "OC-2026-072", usuario: "Almacén Principal", area: "Stock Reserva", tickets: "0 Tickets", estado: "Disponible", colorEstado: "bg-blue-100 text-blue-700" },
+      { id: "MNG-9011-3", sn: "HP-8821033", nombre: "HP ProBook 450 G9", specs: "Intel i5 / 8GB RAM", oc: "OC-2026-091", usuario: "Ana María Torres", area: "Contabilidad", tickets: "2 Tickets", estado: "Asignado", colorEstado: "bg-emerald-100 text-emerald-700" },
+      { id: "MNG-6542-4", sn: "APL-339102", nombre: "MacBook Pro 16\"", specs: "M2 Pro / 32GB RAM", oc: "OC-2026-015", usuario: "Roberto Gómez", area: "Gerencia TI", tickets: "0 Tickets", estado: "Asignado", colorEstado: "bg-emerald-100 text-emerald-700" },
+      { id: "MNG-1123-5", sn: "CSCO-99212", nombre: "Switch Cisco Catalyst 2960", specs: "48 Puertos PoE+", oc: "OC-2025-110", usuario: "Rack Servidores Planta", area: "Infraestructura", tickets: "3 Tickets", estado: "Mantenimiento", colorEstado: "bg-amber-100 text-amber-700" },
+      { id: "MNG-4431-6", sn: "EPS-771120", nombre: "Impresora EPSON L5290", specs: "Multifuncional EcoTank", oc: "OC-2026-044", usuario: "Recepción Central", area: "Administración", tickets: "1 Ticket", estado: "Asignado", colorEstado: "bg-emerald-100 text-emerald-700" },
+      { id: "MNG-3001-7", sn: "SRV-2026-A", nombre: "Servidor Dell PowerEdge R750", specs: "2x Xeon Gold / 128GB RAM", oc: "OC-2026-002", usuario: "Data Center Alpina", area: "Operaciones TI", tickets: "0 Tickets", estado: "Asignado", colorEstado: "bg-emerald-100 text-emerald-700" },
+      { id: "MNG-5521-8", sn: "LNV-441290", nombre: "Laptop Lenovo ThinkBook 15", specs: "AMD Ryzen 5 / 16GB", oc: "OC-2026-088", usuario: "Almacén TI", area: "Repuesto Temporal", tickets: "0 Tickets", estado: "Disponible", colorEstado: "bg-blue-100 text-blue-700" }
+    ];
+
+    // Matriz de datos simulados por filtros
+    const datosDinamicos = {
+      mes: {
+        sla: "94.2%", mttr: "2.4 hrs", inversion: "$45,280", ordenes: "12 Órdenes de Compra",
+        activos: "88%", ratioActivos: "312 Asignados / 355 Total",
+        labelsInversion: ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'],
+        dataInversion: [8500, 12400, 9380, 15000],
+        dataTickets: [45, 25, 18, 12]
+      },
+      trimestre: {
+        sla: "92.8%", mttr: "3.1 hrs", inversion: "$76,680", ordenes: "28 Órdenes de Compra",
+        activos: "91%", ratioActivos: "323 Asignados / 355 Total",
+        labelsInversion: ['Julio', 'Agosto', 'Septiembre'],
+        dataInversion: [9400, 22000, 45280],
+        dataTickets: [110, 65, 42, 30]
+      },
+      anio: {
+        sla: "95.1%", mttr: "2.1 hrs", inversion: "$148,280", ordenes: "64 Órdenes de Compra",
+        activos: "94%", ratioActivos: "334 Asignados / 355 Total",
+        labelsInversion: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep'],
+        dataInversion: [12000, 8500, 15000, 6200, 18900, 11000, 9400, 22000, 45280],
+        dataTickets: [320, 180, 120, 85]
+      }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderizarTabla(equiposBaseDatos);
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+      renderizarGraficos();
+    });
+
+    // Renderiza la lista de equipos en el DOM
+    function renderizarTabla(lista) {
+      const tbody = document.getElementById('tabla-trazabilidad');
+      tbody.innerHTML = '';
+
+      if (lista.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="6" class="px-6 py-8 text-center text-slate-400 font-medium">
+              No se encontraron equipos que coincidan con la búsqueda.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      lista.forEach(eq => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50 transition";
+        tr.innerHTML = `
+          <td class="px-6 py-4">
+            <div class="font-bold text-[#00537E] font-mono">${eq.id}</div>
+            <div class="text-[11px] text-slate-400 font-mono">SN: ${eq.sn}</div>
+          </td>
+          <td class="px-6 py-4">
+            <div class="font-semibold text-slate-800">${eq.nombre}</div>
+            <div class="text-[11px] text-slate-400">${eq.specs}</div>
+          </td>
+          <td class="px-6 py-4 font-mono text-slate-600">${eq.oc}</td>
+          <td class="px-6 py-4">
+            <div class="font-medium text-slate-900">${eq.usuario}</div>
+            <div class="text-[11px] text-slate-400">${eq.area}</div>
+          </td>
+          <td class="px-6 py-4 text-center">
+            <span class="px-2 py-0.5 bg-slate-100 text-slate-700 rounded-full font-bold">${eq.tickets}</span>
+          </td>
+          <td class="px-6 py-4 text-center">
+            <span class="px-2.5 py-1 ${eq.colorEstado} rounded-full font-semibold">${eq.estado}</span>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('subtituloCantActivos').innerText = `Mostrando ${lista.length} de ${equiposBaseDatos.length} activos registrados`;
+    }
+
+    // Funcionalidad de Búsqueda interactiva en tiempo real sobre la base de datos completa
+    function filtrarTrazabilidad() {
+      const input = document.getElementById('busquedaTrazable').value.toLowerCase().trim();
+      const filtrados = equiposBaseDatos.filter(eq => {
+        return eq.id.toLowerCase().includes(input) ||
+               eq.sn.toLowerCase().includes(input) ||
+               eq.nombre.toLowerCase().includes(input) ||
+               eq.oc.toLowerCase().includes(input) ||
+               eq.usuario.toLowerCase().includes(input) ||
+               eq.area.toLowerCase().includes(input);
+      });
+
+      renderizarTabla(filtrados);
+    }
+
+    // Exportación REAL a Excel con TODOS los datos
+    function exportarExcel() {
+      if (typeof XLSX === 'undefined') {
+        alert('⚠️ La librería de Excel no se ha cargado correctamente.');
+        return;
+      }
+
+      // Estructuramos los datos limpios para el archivo Excel
+      const datosExcel = equiposBaseDatos.map(eq => ({
+        "Código Activo": eq.id,
+        "Número de Serie": eq.sn,
+        "Equipo / Modelo": eq.nombre,
+        "Especificaciones": eq.specs,
+        "Orden de Compra": eq.oc,
+        "Usuario Asignado": eq.usuario,
+        "Área / Ubicación": eq.area,
+        "Incidencias Registradas": eq.tickets,
+        "Estado del Ciclo": eq.estado
+      }));
+
+      const hoja = XLSX.utils.json_to_sheet(datosExcel);
+      const libro = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(libro, hoja, "Trazabilidad_Activos");
+
+      const fecha = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(libro, `ManagerTI_Reporte_Trazabilidad_Completo_${fecha}.xlsx`);
+    }
+
+    function renderizarGraficos() {
+      const dataInicial = datosDinamicos.mes;
+
+      // 1. Gráfico de Barras: Inversión en OC
+      const ctxInv = document.getElementById('chartInversion').getContext('2d');
+      chartInversionInstance = new Chart(ctxInv, {
+        type: 'bar',
+        data: {
+          labels: dataInicial.labelsInversion,
+          datasets: [{
+            label: 'Inversión USD ($)',
+            data: dataInicial.dataInversion,
+            backgroundColor: '#00537E',
+            borderRadius: 8
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { borderDash: [4, 4] } },
+            x: { grid: { display: false } }
+          }
+        }
+      });
+
+      // 2. Gráfico Donut: Tickets
+      const ctxTic = document.getElementById('chartTickets').getContext('2d');
+      chartTicketsInstance = new Chart(ctxTic, {
+        type: 'doughnut',
+        data: {
+          labels: ['Hardware', 'Software', 'Redes', 'Accesos'],
+          datasets: [{
+            data: dataInicial.dataTickets,
+            backgroundColor: ['#00537E', '#0284C7', '#38BDF8', '#94A3B8']
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, font: { size: 11 } } }
+          }
+        }
+      });
+    }
+
+    function actualizarMetricas() {
+      const periodo = document.getElementById('filtroPeriodo').value;
+      const sede = document.getElementById('filtroSede').value;
+      const data = datosDinamicos[periodo] || datosDinamicos.mes;
+
+      let mult = 1;
+      if (sede === 'planta') mult = 0.5;
+      else if (sede === 'admin') mult = 0.3;
+      else if (sede === 'logistica') mult = 0.2;
+
+      document.getElementById('kpiSla').innerText = data.sla;
+      document.getElementById('kpiMttr').innerText = data.mttr;
+      
+      const inversionCalculada = Math.round(parseFloat(data.inversion.replace(/[^0-9.]/g, '')) * mult);
+      document.getElementById('kpiInversion').innerText = "$" + inversionCalculada.toLocaleString();
+      document.getElementById('kpiInversionCant').innerText = Math.round(parseInt(data.ordenes) * mult) + " Órdenes de Compra";
+
+      document.getElementById('kpiActivos').innerText = data.activos;
+      document.getElementById('kpiActivosRatio').innerText = data.ratioActivos;
+
+      if (chartInversionInstance) {
+        chartInversionInstance.data.labels = data.labelsInversion;
+        chartInversionInstance.data.datasets[0].data = data.dataInversion.map(val => Math.round(val * mult));
+        chartInversionInstance.update();
+      }
+
+      if (chartTicketsInstance) {
+        chartTicketsInstance.data.datasets[0].data = data.dataTickets.map(val => Math.round(val * mult));
+        chartTicketsInstance.update();
+      }
+    }
+
+    function exportarPDF() {
+      if (typeof html2pdf === 'undefined') {
+        alert('⚠️ La librería de PDF se está cargando. Intenta de nuevo en unos segundos.');
+        return;
+      }
+
+      const elemento = document.getElementById('reporteArea');
+      const btnPdf = document.getElementById('btnPdf');
+
+      const opciones = {
+        margin:       [0.3, 0.3, 0.3, 0.3],
+        filename:     `Reporte_KPIs_ManagerTI_${new Date().toISOString().slice(0, 10)}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2, useCORS: true },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+      };
+
+      const textoOriginal = btnPdf.innerHTML;
+      btnPdf.innerHTML = '<span class="animate-pulse">Generando...</span>';
+      btnPdf.disabled = true;
+
+      html2pdf().set(opciones).from(elemento).save().then(() => {
+        btnPdf.innerHTML = textoOriginal;
+        btnPdf.disabled = false;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      }).catch(err => {
+        console.error('Error al generar PDF:', err);
+        btnPdf.innerHTML = textoOriginal;
+        btnPdf.disabled = false;
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+      });
+    }
+  </script>
+</body>
+</html>
