@@ -8,7 +8,7 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Paleta Corporativa Oficial Pantone -->
+  <!-- Paleta Corporativa Oficial Pantone / Alpina -->
   <script>
     tailwind.config = {
       theme: {
@@ -21,6 +21,11 @@
               silver: '#D1D5DB',
               bgLight: '#F8FAFC',
               cardLight: '#FFFFFF'
+            },
+            alpina: {
+              primary: '#00537E',
+              secondary: '#003E5F',
+              dark: '#002840'
             }
           }
         }
@@ -28,43 +33,71 @@
     }
   </script>
 
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
   <!-- JSZip para empaquetar Cotización y OC -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body class="bg-brand-bgLight text-slate-800 min-h-screen flex flex-col">
 
-  <!-- HEADER PRINCIPAL -->
-  <header class="bg-brand-blue text-white py-4 px-8 shadow-md">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+  <!-- HEADER CORPORATIVO ESTÁNDAR - ALPINA -->
+  <header class="bg-alpina-primary text-white shadow-lg border-b-4 border-alpina-secondary">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
       
-      <!-- LOGO CORPORATIVO -->
-      <div class="flex items-center gap-4">
-        <div class="bg-white/10 p-2 rounded-xl border border-white/20 backdrop-blur-sm flex items-center justify-center">
-          <img src="images/logo.png" alt="Logo ManagerTI" class="h-10 w-auto object-contain">
+      <!-- LADO IZQUIERDO: Logo + Separador Plateado Brilliant + Título -->
+      <div class="flex items-center space-x-5 w-full md:w-auto justify-start">
+        <!-- Logo Alpina al borde izquierdo -->
+        <div class="bg-[#006298] p-1.5 rounded-xl shadow-md flex items-center justify-center overflow-hidden shrink-0">
+          <img
+            src="/images/logo.png"
+            alt="Alpina Logo"
+            class="h-14 md:h-16 w-auto object-contain"
+            onerror="this.src='/images/logoAlpina_negativo.jpeg'"
+          >
         </div>
-        <div>
-          <h1 class="text-2xl font-bold tracking-tight">ManagerTI</h1>
-          <p class="text-blue-200 text-xs">Gestión de Compras y Proveedores TI</p>
+
+        <!-- Barra Plateada / Metálica brillante (Separador) -->
+        <div class="h-10 w-[2px] bg-gradient-to-b from-slate-400 via-slate-100 to-slate-400 shadow-[0_0_8px_rgba(255,255,255,0.8)] hidden sm:block"></div>
+
+        <!-- Identificador de la Aplicación y Página Activa -->
+        <div class="text-left">
+          <div class="flex items-center space-x-2">
+            <h1 class="font-brand text-2xl md:text-3xl tracking-wider font-bold text-white drop-shadow-sm">ManagerTI</h1>
+            <span class="text-xs bg-slate-200/20 text-slate-100 px-2 py-0.5 rounded border border-white/20 font-medium tracking-wide">
+              Órdenes de Compra
+            </span>
+          </div>
+          <p class="text-xs text-slate-200 tracking-widest uppercase font-medium">Gestión & Control de Tecnologías</p>
         </div>
       </div>
 
-      <!-- NAVEGACIÓN ENTRE MÓDULOS -->
-      <div class="flex items-center gap-3">
-        <button onclick="abrirModalNuevaOC()" class="px-4 py-2.5 bg-white text-brand-blue font-semibold text-sm rounded-xl shadow hover:bg-blue-50 transition flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          Nueva Orden de Compra
+      <!-- LADO DERECHO: Botones de Acción Mantenidos Armónicamente -->
+      <div class="flex items-center space-x-3 w-full md:w-auto justify-end flex-wrap">
+        
+        <button onclick="abrirModalNuevaOC()" class="px-3.5 py-2 bg-white text-brand-blue font-semibold text-xs rounded-xl shadow hover:bg-blue-50 transition flex items-center gap-1.5 border border-white/30">
+          <i data-lucide="plus" class="w-4 h-4"></i>
+          <span>Nueva Orden de Compra</span>
         </button>
-        <a href="/inventario.html" class="px-4 py-2.5 bg-brand-blueHover hover:bg-slate-900 text-white text-sm rounded-xl border border-blue-400/30 transition flex items-center gap-2">
-          Inventario TI
+
+        <a href="/inventario.html" class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white font-medium text-xs rounded-xl border border-white/20 transition flex items-center gap-1.5">
+          <i data-lucide="boxes" class="w-4 h-4"></i>
+          <span>Inventario TI</span>
         </a>
-        <a href="/tickets.html" class="px-4 py-2.5 bg-brand-blueHover hover:bg-slate-900 text-white text-sm rounded-xl border border-blue-400/30 transition flex items-center gap-2">
-          Mesa de Tickets
+
+        <a href="/tickets.html" class="px-3.5 py-2 bg-white/10 hover:bg-white/20 text-white font-medium text-xs rounded-xl border border-white/20 transition flex items-center gap-1.5">
+          <i data-lucide="ticket" class="w-4 h-4"></i>
+          <span>Mesa de Tickets</span>
         </a>
+
+        <a href="/" class="bg-white/10 hover:bg-white/20 text-white p-2 rounded-xl transition border border-white/20 flex items-center justify-center" title="Volver al inicio">
+          <i data-lucide="home" class="w-4 h-4"></i>
+        </a>
+
       </div>
+
     </div>
   </header>
-
-  <div class="w-full h-1 bg-gradient-to-r from-gray-300 via-slate-400 to-gray-300 shadow-sm"></div>
 
   <!-- TABLA PRINCIPAL DE ÓRDENES DE COMPRA -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8">
@@ -197,7 +230,12 @@
     let ordenesCache = [];
     let ocSeleccionada = null;
 
-    document.addEventListener('DOMContentLoaded', cargarOrdenesCompra);
+    document.addEventListener('DOMContentLoaded', () => {
+      cargarOrdenesCompra();
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+    });
 
     async function cargarOrdenesCompra() {
       const tbody = document.getElementById('tabla-oc-body');

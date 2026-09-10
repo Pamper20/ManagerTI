@@ -8,17 +8,21 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   
-  <!-- Paleta Corporativa Oficial Pantone -->
+  <!-- Configuración de Colores Estándar Alpina -->
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
+            alpina: {
+              primary: '#00537E',
+              secondary: '#63666A',
+              dark: '#003E5F'
+            },
             brand: {
-              blue: '#00537E',        /* Pantone 7691C */
+              blue: '#00537E',
               blueHover: '#003E5F',
-              grayDark: '#63666A',    /* Pantone Cool Gray 10 C */
-              silver: '#D1D5DB',
+              grayDark: '#63666A',
               bgLight: '#F8FAFC',
               cardLight: '#FFFFFF'
             }
@@ -27,6 +31,9 @@
       }
     }
   </script>
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
   <!-- Editor Quill -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -55,39 +62,64 @@
 </head>
 <body class="bg-brand-bgLight text-slate-800 min-h-screen flex flex-col">
 
-  <!-- HEADER PRINCIPAL -->
-  <header class="bg-brand-blue text-white py-4 px-8 shadow-md">
-    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+  <!-- HEADER CORPORATIVO ESTÁNDAR - ALPINA -->
+  <header class="bg-alpina-primary text-white shadow-lg border-b-4 border-alpina-secondary">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
       
-      <!-- LOGO CORPORATIVO -->
-      <div class="flex items-center gap-4">
-        <div class="bg-white/10 p-2 rounded-xl border border-white/20 backdrop-blur-sm flex items-center justify-center">
-          <img src="images/logo.png" alt="Logo ManagerTI" class="h-10 w-auto object-contain">
+      <!-- LADO IZQUIERDO: Logo + Separador Plateado Brilliant + Identificador de App/Página (ESTÁNDAR) -->
+      <div class="flex items-center space-x-5 w-full md:w-auto justify-start">
+        <!-- Logo Alpina -->
+        <div class="bg-[#006298] p-1.5 rounded-xl shadow-md flex items-center justify-center overflow-hidden shrink-0">
+          <img
+            src="/images/logo.png"
+            alt="Alpina Logo"
+            class="h-14 md:h-16 w-auto object-contain"
+            onerror="this.src='/images/logoAlpina_negativo.jpeg'"
+          >
         </div>
-        <div>
-          <h1 class="text-2xl font-bold tracking-tight">ManagerTI</h1>
-          <p class="text-blue-200 text-xs">Mesa de Ayuda & Soporte Técnico</p>
+
+        <!-- Barra Plateada / Metálica brillante -->
+        <div class="h-10 w-[2px] bg-gradient-to-b from-slate-400 via-slate-100 to-slate-400 shadow-[0_0_8px_rgba(255,255,255,0.8)] hidden sm:block"></div>
+
+        <!-- Identificador de la Aplicación y Página Activa -->
+        <div class="text-left">
+          <div class="flex items-center space-x-2">
+            <h1 class="font-brand text-2xl md:text-3xl tracking-wider font-bold text-white drop-shadow-sm">ManagerTI</h1>
+            <span class="text-xs bg-slate-200/20 text-slate-100 px-2 py-0.5 rounded border border-white/20 font-medium tracking-wide">
+              Mesa de Ayuda
+            </span>
+          </div>
+          <p class="text-xs text-slate-200 tracking-widest uppercase font-medium">Gestión & Control de Tecnologías</p>
         </div>
       </div>
 
-      <!-- BOTONES DE ACCIÓN -->
-      <div class="flex items-center gap-3">
-        <button onclick="abrirModalCrear()" class="px-5 py-2.5 bg-white text-brand-blue font-semibold text-sm rounded-xl shadow hover:bg-blue-50 transition flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          Nuevo Ticket
+      <!-- LADO DERECHO: Estado de Conexión + Botón Nuevo Ticket + Botón Dashboard -->
+      <div class="flex items-center space-x-3 w-full md:w-auto justify-end flex-wrap gap-2 md:gap-0">
+        
+        <!-- Indicador de Estado -->
+        <div class="flex items-center space-x-2 bg-alpina-dark/60 px-3 py-2 rounded-full border border-slate-300/30 shadow-inner mr-1">
+          <div id="status-indicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+          <span id="status-text" class="text-xs font-medium tracking-wide text-slate-100">En Línea</span>
+        </div>
+
+        <!-- BOTÓN NUEVO TICKET (Integrado en el Header) -->
+        <button onclick="abrirModalCrear()" class="px-4 py-2 bg-white text-brand-blue font-semibold text-xs rounded-xl shadow hover:bg-blue-50 transition flex items-center gap-1.5">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          <span>Nuevo Ticket</span>
         </button>
-        <a href="/dashboard.html" class="px-4 py-2.5 bg-brand-blueHover hover:bg-slate-900 text-white text-sm rounded-xl border border-blue-400/30 transition flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
-          Dashboard
+
+        <!-- BOTÓN DASHBOARD -->
+        <a href="/dashboard.html" class="px-4 py-2 bg-alpina-dark hover:bg-slate-900 text-white text-xs font-medium rounded-xl border border-white/20 transition flex items-center gap-1.5" title="Ir al Dashboard">
+          <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+          <span>Dashboard</span>
         </a>
+
       </div>
+
     </div>
   </header>
 
-  <!-- LÍNEA SEPARADORA PLATEADA -->
-  <div class="w-full h-1 bg-gradient-to-r from-gray-300 via-slate-400 to-gray-300 shadow-sm"></div>
-
-  <!-- PANEL PRINCIPAL -->
+  <!-- PANEL PRINCIPAL CON TABLA -->
   <main class="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8">
     <div class="bg-brand-cardLight border border-slate-200 rounded-2xl shadow-sm overflow-hidden">
       <div class="overflow-x-auto">
@@ -177,11 +209,11 @@
     </div>
   </div>
 
-  <!-- MODAL 2: VISTA DETALLADA Y GESTIÓN DE ATENCIÓN TI -->
+  <!-- MODAL 2: DETALLE Y GESTIÓN TI -->
   <div id="modalDetalle" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
     <div class="bg-white border border-slate-200 rounded-2xl w-full max-w-4xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
       
-      <!-- Header Detalle -->
+      <!-- Header Modal Detalle -->
       <div class="px-6 py-4 bg-brand-blue text-white flex justify-between items-center">
         <div>
           <span id="detIdCorrelativo" class="text-xs font-mono bg-blue-900/50 px-2 py-1 rounded text-blue-200 font-bold"></span>
@@ -190,10 +222,10 @@
         <button onclick="cerrarModalDetalle()" class="text-blue-200 hover:text-white text-2xl">&times;</button>
       </div>
 
-      <!-- Cuerpo Detalle -->
+      <!-- Cuerpo Modal Detalle -->
       <div class="p-6 overflow-y-auto space-y-6 flex-1 text-sm text-slate-700">
         
-        <!-- CONTROL DE ATENCIÓN Y CRONÓMETRO TI -->
+        <!-- CONTROL DE CRONÓMETRO TI -->
         <div class="bg-gradient-to-r from-slate-900 to-brand-blue text-white p-5 rounded-2xl shadow-inner flex flex-col md:flex-row justify-between items-center gap-4">
           <div>
             <p class="text-xs text-blue-200 uppercase tracking-wider font-semibold">Cronómetro de Atención Técnica</p>
@@ -203,7 +235,6 @@
             <p id="estadoCronometroTexto" class="text-xs text-slate-300 mt-1">Estado actual: Abierto</p>
           </div>
 
-          <!-- BOTONES DE ESTADO DE ATENCIÓN -->
           <div class="flex flex-wrap gap-2">
             <button id="btnAbierto" disabled class="px-4 py-2 bg-slate-700 text-slate-400 font-semibold text-xs rounded-xl shadow cursor-not-allowed flex items-center gap-1.5 opacity-50">
               🔴 Abierto
@@ -217,10 +248,10 @@
           </div>
         </div>
 
-        <!-- VENTANA DE TRABAJO COORDINADA CON EL USUARIO -->
+        <!-- VENTANA DE TRABAJO COORDINADA -->
         <div class="bg-blue-50/60 border border-blue-200 p-4 rounded-xl space-y-3">
           <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-brand-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <i data-lucide="calendar" class="w-5 h-5 text-brand-blue"></i>
             <h4 class="font-bold text-slate-900 text-xs uppercase tracking-wider">Coordinación de Ventana de Trabajo (Disponibilidad Solicitante)</h4>
           </div>
 
@@ -267,17 +298,17 @@
           </div>
         </div>
 
-        <!-- Contenido Descripción HTML -->
+        <!-- Descripción HTML -->
         <div>
           <h4 class="text-xs font-semibold text-brand-grayDark uppercase tracking-wider mb-2">Descripción Detallada</h4>
           <div id="detDescripcion" class="bg-slate-50 border border-slate-200 p-4 rounded-xl min-h-[100px] prose text-slate-800"></div>
         </div>
 
-        <!-- Área de Adjuntos ZIP -->
+        <!-- Adjuntos ZIP -->
         <div id="detSeccionAdjuntos" class="border-t border-slate-200 pt-4 hidden">
           <h4 class="text-xs font-semibold text-brand-grayDark uppercase tracking-wider mb-2">Archivos Adjuntos</h4>
           <button id="btnDescargarZip" class="px-4 py-2.5 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-semibold transition flex items-center gap-2">
-            <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            <i data-lucide="download" class="w-4 h-4 text-emerald-400"></i>
             Descargar Archivos Adjuntos (.ZIP)
           </button>
         </div>
@@ -292,6 +323,7 @@
     </div>
   </div>
 
+  <!-- LÓGICA DE JAVASCRIPT -->
   <script>
     let quill;
     let listaTicketsCache = [];
@@ -299,6 +331,10 @@
     let timerInterval = null;
 
     document.addEventListener('DOMContentLoaded', () => {
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+
       quill = new Quill('#editorDescripcion', {
         theme: 'snow',
         placeholder: 'Escriba la descripción detallada...',
@@ -313,7 +349,7 @@
 
       cargarTickets();
 
-      // Escuchador global para cerrar modales al presionar la tecla Escape
+      // Cerrar modales con Escape
       document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
           cerrarModalCrear();
@@ -333,7 +369,7 @@
       document.getElementById('modalTicket').classList.add('hidden');
       document.getElementById('modalTicket').classList.remove('flex');
       document.getElementById('formNuevoTicket').reset();
-      quill.setText('');
+      quill.setContents([]);
     }
 
     async function cargarTickets() {
@@ -341,24 +377,19 @@
       try {
         const res = await fetch('/api/tickets');
         let tickets = await res.json();
-        
-        console.log("Tickets cargados desde Firestore:", tickets);
 
         if (!Array.isArray(tickets) || tickets.length === 0) {
           tbody.innerHTML = `<tr><td colspan="8" class="px-6 py-8 text-center text-slate-400">No hay tickets registrados.</td></tr>`;
           return;
         }
 
-        // 1. Asignar correlativo INMUTABLE basado en el índice original
         listaTicketsCache = tickets.map((t, index) => {
           const num = String(index + 1).padStart(3, '0');
           return { ...t, correlativo: `TK-${num}` };
         });
 
-        // 2. Invertir la lista para mostrar el ticket más reciente arriba
         const ticketsParaMostrar = [...listaTicketsCache].reverse();
 
-        // 3. Renderizar filas en la tabla
         tbody.innerHTML = ticketsParaMostrar.map(t => {
           const usuario = t.usuario || t.nombre || t.solicitante || 'N/A';
           const asunto = t.asunto || t.titulo || 'Sin asunto';
@@ -373,7 +404,7 @@
               <td class="px-6 py-4 font-medium text-slate-900">${usuario}</td>
               <td class="px-6 py-4 text-slate-700">${asunto}</td>
               <td class="px-6 py-4">
-                <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${obtenerBadge(estado)}">
+                <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${obtenerBadge(estado, t.cronometroActivo)}">
                   ${estado}
                 </span>
               </td>
@@ -405,14 +436,12 @@
       document.getElementById('detPrioridad').innerText = ticketSeleccionado.prioridad || 'Media';
       document.getElementById('detFecha').innerText = ticketSeleccionado.fecha_creacion_formateada || ticketSeleccionado.fecha || 'N/A';
       
-      // Ventana de Trabajo
       document.getElementById('ventanaInicioInput').value = ticketSeleccionado.ventanaInicio || '';
       document.getElementById('ventanaFinInput').value = ticketSeleccionado.ventanaFin || '';
       document.getElementById('notaCoordinacionInput').value = ticketSeleccionado.notaCoordinacion || '';
 
       document.getElementById('detDescripcion').innerHTML = ticketSeleccionado.descripcion_html || '<p class="text-slate-400 italic">Sin descripción registrada.</p>';
 
-      // Adjuntos ZIP
       const seccionAdjuntos = document.getElementById('detSeccionAdjuntos');
       const btnDescargar = document.getElementById('btnDescargarZip');
 
@@ -435,19 +464,16 @@
       const estado = ticketSeleccionado.estado || 'Abierto';
       const estaCorriendo = ticketSeleccionado.cronometroActivo === true;
 
-      // Actualizar Badge de Estado
       document.getElementById('detEstadoContainer').innerHTML = `
-        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${obtenerBadge(estado)}">${estado}</span>
+        <span class="px-2.5 py-1 rounded-full text-xs font-semibold ${obtenerBadge(estado, estaCorriendo)}">${estado}</span>
       `;
 
-      // Texto explicativo bajo el cronómetro
       let textoEstado = `Estado actual: ${estado}`;
       if (estado === 'En Proceso') {
         textoEstado += estaCorriendo ? ' (Corriendo 🟢)' : ' (Pausado ⏸)';
       }
       document.getElementById('estadoCronometroTexto').innerText = textoEstado;
 
-      // Botón "En Proceso"
       const btnEnProcesoIcon = document.getElementById('btnEnProcesoIcon');
       const btnEnProcesoText = document.getElementById('btnEnProcesoText');
       const btnEnProceso = document.getElementById('btnEnProceso');
@@ -588,6 +614,9 @@
         });
 
         if (res.ok) {
+          ticketSeleccionado.ventanaInicio = payload.ventanaInicio;
+          ticketSeleccionado.ventanaFin = payload.ventanaFin;
+          ticketSeleccionado.notaCoordinacion = payload.notaCoordinacion;
           alert("✓ Ventana de trabajo guardada con éxito.");
         }
       } catch (err) {
@@ -669,12 +698,18 @@
       }
     }
 
-    function obtenerBadge(estado) {
+    function obtenerBadge(estado, cronometroActivo = false) {
       switch (estado) {
-        case 'Abierto': return 'bg-red-100 text-red-700 border border-red-200';
-        case 'En Proceso': return 'bg-emerald-100 text-emerald-700 border border-emerald-200';
-        case 'Finalizado': return 'bg-blue-100 text-blue-700 border border-blue-200';
-        default: return 'bg-slate-100 text-slate-600';
+        case 'Abierto': 
+          return 'bg-red-100 text-red-700 border border-red-200';
+        case 'En Proceso': 
+          return cronometroActivo 
+            ? 'bg-emerald-100 text-emerald-700 border border-emerald-200'
+            : 'bg-amber-100 text-amber-700 border border-amber-200';
+        case 'Finalizado': 
+          return 'bg-blue-100 text-blue-700 border border-blue-200';
+        default: 
+          return 'bg-slate-100 text-slate-600';
       }
     }
   </script>

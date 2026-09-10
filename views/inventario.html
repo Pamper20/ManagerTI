@@ -37,44 +37,57 @@
 </head>
 <body class="bg-alpina-light font-sans min-h-screen flex flex-col justify-between text-slate-800">
 
-  <!-- Encabezado con Logo Local y Línea Plateada Brillante -->
-  <header class="bg-alpina-primary text-white shadow-lg border-b-4 border-alpina-secondary">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
+ <!-- HEADER CORPORATIVO ESTÁNDAR - ALPINA -->
+<header class="bg-alpina-primary text-white shadow-lg border-b-4 border-alpina-secondary">
+  <div class="max-w-7xl mx-auto px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+    
+    <!-- LADO IZQUIERDO: Logo + Separador Plateado Brilliant + Título -->
+    <div class="flex items-center space-x-5 w-full md:w-auto justify-start">
+      <!-- Logo Alpina al borde izquierdo -->
+      <div class="bg-[#006298] p-1.5 rounded-xl shadow-md flex items-center justify-center overflow-hidden shrink-0">
+        <img
+          src="/images/logo.png"
+          alt="Alpina Logo"
+          class="h-14 md:h-16 w-auto object-contain"
+          onerror="this.src='/images/logoAlpina_negativo.jpeg'"
+        >
+      </div>
+
+      <!-- Barra Plateada / Metálica brillante (Separador) -->
+      <div class="h-10 w-[2px] bg-gradient-to-b from-slate-400 via-slate-100 to-slate-400 shadow-[0_0_8px_rgba(255,255,255,0.8)] hidden sm:block"></div>
+
+      <!-- Identificador de la Aplicación y Página Activa -->
+      <div class="text-left">
+        <div class="flex items-center space-x-2">
+          <h1 class="font-brand text-2xl md:text-3xl tracking-wider font-bold text-white drop-shadow-sm">ManagerTI</h1>
+          <span class="text-xs bg-slate-200/20 text-slate-100 px-2 py-0.5 rounded border border-white/20 font-medium tracking-wide">
+            <!-- CAMBIAR ESTE TEXTO SEGÚN LA PÁGINA -->
+            Mesa de Ayuda
+          </span>
+        </div>
+        <p class="text-xs text-slate-200 tracking-widest uppercase font-medium">Gestión & Control de Tecnologías</p>
+      </div>
+    </div>
+
+    <!-- LADO DERECHO: Estado de Conexión + Botones de Acción -->
+    <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
       
-      <div class="flex items-center space-x-6">
-        <div class="bg-[#006298] p-1 rounded-xl shadow-md flex items-center justify-center overflow-hidden">
-          <img
-            src="/images/logo.png"
-            alt="Alpina Logo"
-            class="h-16 md:h-20 w-auto object-contain scale-105"
-            onerror="this.src='/images/logoAlpina_negativo.jpeg'"
-          >
-        </div>
-
-        <!-- Línea plateada con brillo -->
-        <div class="h-12 w-[2px] bg-gradient-to-b from-transparent via-slate-300 to-transparent shadow-[0_0_8px_rgba(255,255,255,0.8)] hidden sm:block"></div>
-
-        <div>
-          <h1 class="font-brand text-2xl md:text-3xl font-bold tracking-wider text-white drop-shadow-sm">ManagerTI</h1>
-          <p class="text-xs md:text-sm text-slate-200 tracking-wider font-medium">Inventario & Activos TI</p>
-        </div>
+      <!-- Indicador de Estado -->
+      <div class="flex items-center space-x-2 bg-alpina-dark/60 px-3 py-1.5 rounded-full border border-slate-300/30 shadow-inner">
+        <div id="status-indicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+        <span id="status-text" class="text-xs font-medium tracking-wide text-slate-100">En Línea</span>
       </div>
 
-      <!-- Navegación -->
-      <div class="flex items-center gap-3">
-        <a href="/" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium text-xs rounded-lg transition-colors flex items-center gap-2">
-          <i data-lucide="home" class="w-4 h-4"></i> Dashboard
-        </a>
-        <a href="/tickets.html" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium text-xs rounded-lg transition-colors flex items-center gap-2">
-          <i data-lucide="life-buoy" class="w-4 h-4"></i> Tickets
-        </a>
-        <a href="/ordenes_compra.html" class="px-4 py-2 bg-white/10 hover:bg-white/20 text-white font-medium text-xs rounded-lg transition-colors flex items-center gap-2">
-          <i data-lucide="shopping-cart" class="w-4 h-4"></i> Órdenes de Compra
-        </a>
-      </div>
+      <!-- Botón Volver al Dashboard (Visible en subpáginas) -->
+      <a href="/" class="bg-white/10 hover:bg-white/20 text-white p-2 rounded-lg transition border border-white/20 flex items-center space-x-1 text-xs font-medium" title="Volver al inicio">
+        <i data-lucide="home" class="w-4 h-4"></i>
+        <span class="hidden sm:inline">Inicio</span>
+      </a>
 
     </div>
-  </header>
+
+  </div>
+</header>
 
   <!-- Contenido Principal -->
   <main class="max-w-7xl mx-auto px-6 py-8 w-full flex-grow">

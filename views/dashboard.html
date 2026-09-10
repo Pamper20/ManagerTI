@@ -41,35 +41,45 @@
 </head>
 <body class="bg-alpina-light font-sans min-h-screen flex flex-col justify-between text-slate-800">
 
-  <!-- 1. PARTE SUPERIOR: Encabezado -->
+  <!-- 1. ENCABEZADO ESTANDARIZADO -->
   <header class="bg-alpina-primary text-white shadow-lg border-b-4 border-alpina-secondary">
-    <div class="max-w-7xl mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
-     
-      <div class="flex items-center space-x-6">
-        <div class="bg-[#006298] p-1 rounded-xl shadow-md flex items-center justify-center overflow-hidden">
+    <div class="max-w-7xl mx-auto px-6 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <!-- IZQUIERDA: Logo + Barra Plateada + Nombre de Página -->
+      <div class="flex items-center space-x-5 w-full md:w-auto justify-start">
+        <div class="bg-[#006298] p-1.5 rounded-xl shadow-md flex items-center justify-center overflow-hidden shrink-0">
           <img
             src="/images/logo.png"
             alt="Alpina Logo"
-            class="h-16 md:h-20 w-auto object-contain scale-105"
+            class="h-14 md:h-16 w-auto object-contain"
             onerror="this.src='/images/logoAlpina_negativo.jpeg'"
           >
         </div>
-        <div class="h-12 w-0.5 bg-white/30 hidden sm:block"></div>
-        <div>
-          <h1 class="font-brand text-3xl md:text-4xl tracking-wider font-bold text-white drop-shadow-sm">ManagerTI</h1>
-          <p class="text-xs md:text-sm text-slate-200 tracking-widest uppercase font-medium">Gestión & Control de Tecnologías</p>
+
+        <!-- Barra plateada brillante -->
+        <div class="h-10 w-[2px] bg-gradient-to-b from-slate-400 via-slate-100 to-slate-400 shadow-[0_0_8px_rgba(255,255,255,0.8)] hidden sm:block"></div>
+
+        <div class="text-left">
+          <div class="flex items-center space-x-2">
+            <h1 class="font-brand text-2xl md:text-3xl tracking-wider font-bold text-white drop-shadow-sm">ManagerTI</h1>
+            <span class="text-xs bg-white/20 text-slate-100 px-2 py-0.5 rounded border border-white/20 font-medium">Dashboard</span>
+          </div>
+          <p class="text-xs text-slate-200 tracking-widest uppercase font-medium">Gestión & Control de Tecnologías</p>
         </div>
       </div>
 
-      <div class="flex items-center space-x-3 bg-alpina-dark/50 px-4 py-2 rounded-full border border-white/10">
-        <div id="status-indicator" class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse"></div>
-        <span id="status-text" class="text-xs font-medium tracking-wide">Sistema En Línea | Firebase Node.js</span>
+      <!-- DERECHA: Indicador de Sistema e Interfaz -->
+      <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
+        <div class="flex items-center space-x-2 bg-alpina-dark/60 px-3 py-1.5 rounded-full border border-slate-300/30 shadow-inner">
+          <div id="status-indicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
+          <span id="status-text" class="text-xs font-medium tracking-wide text-slate-100">Sistema En Línea</span>
+        </div>
       </div>
 
     </div>
   </header>
 
-  <!-- 2. PARTE CENTRAL: Panel de Navegación (Rutas corregidas) -->
+  <!-- 2. NAVEGACIÓN PRINCIPAL -->
   <main class="max-w-7xl mx-auto px-6 py-10 w-full flex-grow flex flex-col justify-center">
    
     <div class="text-center mb-10">
@@ -79,7 +89,6 @@
 
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
      
-      <!-- Opción 1: Inventario TI (CORREGIDO) -->
       <a href="/inventario.html" class="glass-card group p-6 rounded-2xl shadow-md hover:shadow-xl border border-slate-200 hover:border-alpina-primary transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center">
         <div class="w-16 h-16 bg-alpina-primary/10 rounded-2xl flex items-center justify-center text-alpina-primary group-hover:bg-alpina-primary group-hover:text-white transition-colors duration-300 mb-4 shadow-sm">
           <i data-lucide="laptop" class="w-8 h-8"></i>
@@ -88,7 +97,6 @@
         <p class="text-xs text-alpina-secondary">Control de laptops, servidores y equipos en stock.</p>
       </a>
 
-      <!-- Opción 2: Tickets de Soporte (Mesa de Ayuda) -->
       <a href="/tickets.html" class="glass-card group p-6 rounded-2xl shadow-md hover:shadow-xl border border-slate-200 hover:border-alpina-primary transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center">
         <div class="w-16 h-16 bg-alpina-primary/10 rounded-2xl flex items-center justify-center text-alpina-primary group-hover:bg-alpina-primary group-hover:text-white transition-colors duration-300 mb-4 shadow-sm">
           <i data-lucide="life-buoy" class="w-8 h-8"></i>
@@ -97,7 +105,6 @@
         <p class="text-xs text-alpina-secondary">Gestión de tickets, atención e incidentes TI.</p>
       </a>
 
-      <!-- Opción 3: Compras (CORREGIDO) -->
       <a href="/ordenes_compra.html" class="glass-card group p-6 rounded-2xl shadow-md hover:shadow-xl border border-slate-200 hover:border-alpina-primary transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center">
         <div class="w-16 h-16 bg-alpina-primary/10 rounded-2xl flex items-center justify-center text-alpina-primary group-hover:bg-alpina-primary group-hover:text-white transition-colors duration-300 mb-4 shadow-sm">
           <i data-lucide="shopping-cart" class="w-8 h-8"></i>
@@ -106,7 +113,6 @@
         <p class="text-xs text-alpina-secondary">Ingreso de compras, garantías y proveedores.</p>
       </a>
 
-      <!-- Opción 4: Reportes -->
       <a href="#" class="glass-card group p-6 rounded-2xl shadow-md hover:shadow-xl border border-slate-200 hover:border-alpina-primary transition-all duration-300 transform hover:-translate-y-1 flex flex-col items-center text-center">
         <div class="w-16 h-16 bg-alpina-primary/10 rounded-2xl flex items-center justify-center text-alpina-primary group-hover:bg-alpina-primary group-hover:text-white transition-colors duration-300 mb-4 shadow-sm">
           <i data-lucide="bar-chart-3" class="w-8 h-8"></i>
@@ -119,7 +125,7 @@
 
   </main>
 
-  <!-- 3. PARTE INFERIOR: Panel de Resumen -->
+  <!-- 3. FOOTER RESUMEN -->
   <footer class="bg-white border-t border-slate-200 shadow-inner py-6">
     <div class="max-w-7xl mx-auto px-6">
       <div class="flex items-center justify-between mb-4">
@@ -137,12 +143,12 @@
           <p id="kpi-process" class="text-2xl font-bold text-amber-600">--</p>
         </div>
         <div class="bg-alpina-light p-3 rounded-lg border border-slate-200">
-          <p class="text-xs text-alpina-secondary font-medium">SLA Vencido</p>
+          <p class="text-xs text-alpina-secondary font-medium">Equipos Inoperativos</p>
           <p id="kpi-sla" class="text-2xl font-bold text-rose-600">--</p>
         </div>
         <div class="bg-alpina-light p-3 rounded-lg border border-slate-200">
-          <p class="text-xs text-alpina-secondary font-medium">Alertas Stock Bajo</p>
-          <p id="kpi-alerts" class="text-2xl font-bold text-alpina-secondary">--</p>
+          <p class="text-xs text-alpina-secondary font-medium">Stock Disponible</p>
+          <p id="kpi-alerts" class="text-2xl font-bold text-emerald-600">--</p>
         </div>
       </div>
     </div>
@@ -151,31 +157,42 @@
   <script>
     lucide.createIcons();
 
-    // Consulta de KPIs desde backend
     async function fetchMetrics() {
       try {
-        const response = await fetch('/api/tickets');
-        if (response.ok) {
-          const tickets = await response.json();
-          
-          const abiertos = tickets.filter(t => t.estado === 'Abierto').length;
-          const enProceso = tickets.filter(t => t.estado === 'En Proceso').length;
-          
-          document.getElementById('kpi-open').innerText = abiertos;
-          document.getElementById('kpi-process').innerText = enProceso;
-          document.getElementById('kpi-sla').innerText = 0;
-          document.getElementById('kpi-alerts').innerText = 0;
-          
-          const now = new Date();
-          document.getElementById('last-updated').innerText = `Actualizado: ${now.toLocaleTimeString()}`;
+        const [resTickets, resActivos] = await Promise.all([
+          fetch('/api/tickets').catch(() => null),
+          fetch('/api/activos').catch(() => null)
+        ]);
+
+        if (resTickets && resTickets.ok) {
+          const tickets = await resTickets.json();
+          document.getElementById('kpi-open').innerText = tickets.filter(t => (t.estado || '').toLowerCase() === 'abierto').length;
+          document.getElementById('kpi-process').innerText = tickets.filter(t => (t.estado || '').toLowerCase() === 'en proceso').length;
         }
+
+        if (resActivos && resActivos.ok) {
+          const activos = await resActivos.json();
+          document.getElementById('kpi-sla').innerText = activos.filter(a => (a.estado || '').toUpperCase() === 'INOPERATIVO').length;
+          document.getElementById('kpi-alerts').innerText = activos.filter(a => 
+            (a.usuarioAsignado || '').toUpperCase().includes('SIN ASIGNAR') || 
+            (a.estado || '').toUpperCase() === 'DISPONIBLE'
+          ).length;
+        }
+
+        const now = new Date();
+        document.getElementById('last-updated').innerText = `Actualizado: ${now.toLocaleTimeString('es-PE')}`;
+        document.getElementById('status-indicator').className = 'w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse';
+        document.getElementById('status-text').innerText = 'Sistema En Línea';
+
       } catch (err) {
-        console.error("Error al conectar con la API de tickets:", err);
+        console.error("Error consultando backend:", err);
+        document.getElementById('status-indicator').className = 'w-2.5 h-2.5 rounded-full bg-rose-500';
+        document.getElementById('status-text').innerText = 'Desconectado';
       }
     }
 
     fetchMetrics();
-    setInterval(fetchMetrics, 15000); // Refresca métricas cada 15 seg
+    setInterval(fetchMetrics, 15000);
   </script>
 </body>
 </html>
