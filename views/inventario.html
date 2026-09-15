@@ -43,7 +43,6 @@
     
     <!-- LADO IZQUIERDO: Logo + Separador Plateado Brilliant + Título -->
     <div class="flex items-center space-x-5 w-full md:w-auto justify-start">
-      <!-- Logo Alpina al borde izquierdo -->
       <div class="bg-[#006298] p-1.5 rounded-xl shadow-md flex items-center justify-center overflow-hidden shrink-0">
         <img
           src="/images/logo.png"
@@ -53,16 +52,13 @@
         >
       </div>
 
-      <!-- Barra Plateada / Metálica brillante (Separador) -->
       <div class="h-10 w-[2px] bg-gradient-to-b from-slate-400 via-slate-100 to-slate-400 shadow-[0_0_8px_rgba(255,255,255,0.8)] hidden sm:block"></div>
 
-      <!-- Identificador de la Aplicación y Página Activa -->
       <div class="text-left">
         <div class="flex items-center space-x-2">
           <h1 class="font-brand text-2xl md:text-3xl tracking-wider font-bold text-white drop-shadow-sm">ManagerTI</h1>
           <span class="text-xs bg-slate-200/20 text-slate-100 px-2 py-0.5 rounded border border-white/20 font-medium tracking-wide">
-            <!-- CAMBIAR ESTE TEXTO SEGÚN LA PÁGINA -->
-            Mesa de Ayuda
+            Inventario TI
           </span>
         </div>
         <p class="text-xs text-slate-200 tracking-widest uppercase font-medium">Gestión & Control de Tecnologías</p>
@@ -71,19 +67,15 @@
 
     <!-- LADO DERECHO: Estado de Conexión + Botones de Acción -->
     <div class="flex items-center space-x-3 w-full md:w-auto justify-end">
-      
-      <!-- Indicador de Estado -->
       <div class="flex items-center space-x-2 bg-alpina-dark/60 px-3 py-1.5 rounded-full border border-slate-300/30 shadow-inner">
         <div id="status-indicator" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></div>
         <span id="status-text" class="text-xs font-medium tracking-wide text-slate-100">En Línea</span>
       </div>
 
-      <!-- Botón Volver al Dashboard (Visible en subpáginas) -->
       <a href="/" class="bg-white/10 hover:bg-white/20 text-white p-2 rounded-lg transition border border-white/20 flex items-center space-x-1 text-xs font-medium" title="Volver al inicio">
         <i data-lucide="home" class="w-4 h-4"></i>
         <span class="hidden sm:inline">Inicio</span>
       </a>
-
     </div>
 
   </div>
@@ -92,20 +84,34 @@
   <!-- Contenido Principal -->
   <main class="max-w-7xl mx-auto px-6 py-8 w-full flex-grow">
     
-    <!-- Barra Superior de Acciones -->
-    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+    <!-- Barra Superior de Acciones y Filtros -->
+    <div class="flex flex-col lg:flex-row items-center justify-between gap-4 mb-6 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
       <div>
         <h3 class="text-lg font-bold text-alpina-primary">Gestión de Activos TI</h3>
         <p class="text-xs text-alpina-secondary">Monitoreo de equipos, asignaciones y licencias asociadas.</p>
       </div>
 
-      <div class="flex items-center gap-3">
-        <!-- Limpiar datos viejos/erróneos -->
+      <!-- Buscador en tiempo real -->
+      <div class="w-full lg:w-96">
+        <div class="relative">
+          <input 
+            type="text" 
+            id="input-buscar-inventario" 
+            onkeyup="filtrarInventario()"
+            placeholder="Buscar por serie, modelo, usuario, estado..." 
+            class="w-full pl-10 pr-4 py-2 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-alpina-primary focus:bg-white transition-all"
+          >
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+            <i data-lucide="search" class="w-4 h-4"></i>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 w-full lg:w-auto justify-end">
         <button onclick="vaciarInventario()" class="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg shadow transition-colors flex items-center gap-2">
           <i data-lucide="trash-2" class="w-4 h-4"></i> Limpiar Inventario
         </button>
 
-        <!-- Input Oculto para Cargar Excel -->
         <input type="file" id="excel-input" accept=".xlsx, .xls" class="hidden" onchange="procesarExcel(event)">
         
         <button onclick="document.getElementById('excel-input').click()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold rounded-lg shadow transition-colors flex items-center gap-2">
@@ -126,7 +132,7 @@
               <th class="p-4">Usuario / Sede</th>
               <th class="p-4">Ubicación</th>
               <th class="p-4">Estado</th>
-              <th class="p-4 text-center">Detalles & Licencias</th>
+              <th class="p-4 text-center">Ficha & Acciones</th>
             </tr>
           </thead>
           <tbody id="tabla-activos" class="divide-y divide-slate-100 text-slate-600">
@@ -139,7 +145,86 @@
     </div>
   </main>
 
+  <!-- MODAL DE ACTUALIZACIÓN DE ACTIVO Y LICENCIAS -->
+  <div id="modal-actualizar" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+    <div class="bg-white rounded-2xl shadow-xl border border-slate-200 w-full max-w-xl p-6 relative max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200">
+        <h3 class="text-base font-bold text-alpina-primary flex items-center gap-2">
+          <i data-lucide="refresh-cw" class="w-5 h-5 text-alpina-primary"></i> Actualizar Activo & Licencias
+        </h3>
+        <button onclick="cerrarModal()" class="text-slate-400 hover:text-slate-600">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <form id="form-actualizar-activo" onsubmit="guardarActualizacion(event)" class="mt-4 space-y-4">
+        <input type="hidden" id="activo-id">
+
+        <!-- Datos Generales -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Estado del Activo</label>
+            <select id="activo-estado" class="w-full p-2.5 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-alpina-primary">
+              <option value="OPERATIVO">OPERATIVO / Disponible</option>
+              <option value="ASIGNADO">ASIGNADO</option>
+              <option value="MANTENIMIENTO">EN MANTENIMIENTO</option>
+              <option value="DETERIORO">DETERIORADO</option>
+              <option value="BAJA">DADO DE BAJA</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Usuario Asignado</label>
+            <input type="text" id="activo-usuario" class="w-full p-2.5 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-alpina-primary" placeholder="Nombre del trabajador">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Ubicación / Área</label>
+          <input type="text" id="activo-ubicacion" class="w-full p-2.5 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-alpina-primary" placeholder="Ej. Almacén, Oficina 301, Sede Central">
+        </div>
+
+        <!-- Sección de Gestión de Licencias -->
+        <div class="pt-2 border-t border-slate-200">
+          <p class="text-xs font-bold text-alpina-primary mb-2 flex items-center gap-1.5">
+            <i data-lucide="key" class="w-4 h-4"></i> Asignación de Licencias
+          </p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Licencia Windows</label>
+              <input type="text" id="licencia-windows" class="w-full p-2 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-alpina-primary" placeholder="Ej. Win 11 Pro / Key">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Licencia Office</label>
+              <input type="text" id="licencia-office" class="w-full p-2 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-alpina-primary" placeholder="Ej. M365 Bus Standard">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-slate-600 mb-1">Licencia AutoCAD</label>
+              <input type="text" id="licencia-autocad" class="w-full p-2 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-alpina-primary" placeholder="Ej. AutoCAD 2024 / Serial">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Observaciones</label>
+          <textarea id="activo-observaciones" rows="2" class="w-full p-2.5 text-xs bg-slate-50 border border-slate-300 rounded-lg focus:ring-2 focus:ring-alpina-primary" placeholder="Detalles de la actualización o fallas reportadas..."></textarea>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-200">
+          <button type="button" onclick="cerrarModal()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition-colors">
+            Cancelar
+          </button>
+          <button type="submit" class="px-4 py-2 bg-alpina-primary hover:bg-alpina-dark text-white text-xs font-semibold rounded-lg shadow transition-colors flex items-center gap-1.5">
+            <i data-lucide="check" class="w-4 h-4"></i> Guardar Cambios
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script>
+    let listaActivosGlobal = [];
+
     lucide.createIcons();
 
     // 1. Cargar activos desde el servidor Node.js
@@ -147,15 +232,16 @@
       try {
         const res = await fetch('/api/activos');
         const activos = await res.json();
+        listaActivosGlobal = activos || [];
         
         const tbody = document.getElementById('tabla-activos');
-        if (!activos || activos.length === 0) {
+        if (!listaActivosGlobal || listaActivosGlobal.length === 0) {
           tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-slate-400">No hay activos registrados. Presiona "Importar Excel" para cargar tu plantilla.</td></tr>`;
           return;
         }
 
-        tbody.innerHTML = activos.map((item, idx) => `
-          <tr class="hover:bg-slate-50 transition-colors">
+        tbody.innerHTML = listaActivosGlobal.map((item, idx) => `
+          <tr class="fila-activo hover:bg-slate-50 transition-colors">
             <td class="p-4 font-semibold text-slate-800">
               ${item.tipo || 'Equipo'}
               <div class="text-xs font-normal text-slate-400">${item.nombreEquipo || ''}</div>
@@ -170,38 +256,48 @@
             <td class="p-4">
               <span class="px-2.5 py-1 text-xs rounded-full font-medium ${
                 item.estado === 'OPERATIVO' || item.estado === 'Disponible' ? 'bg-emerald-100 text-emerald-700' :
+                item.estado === 'ASIGNADO' ? 'bg-blue-100 text-blue-700' :
                 item.estado === 'DETERIORO' || item.estado === 'BAJA' ? 'bg-rose-100 text-rose-700' : 'bg-slate-100 text-slate-600'
               }">
                 ${item.estado || 'OPERATIVO'}
               </span>
             </td>
             <td class="p-4 text-center">
-              <button onclick="toggleDetalle('${idx}')" class="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs rounded font-medium transition-colors">
-                Ver Ficha
+              <button onclick="toggleDetalle('${idx}')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs rounded font-medium transition-colors inline-flex items-center gap-1">
+                <i data-lucide="eye" class="w-3.5 h-3.5"></i> Ver Ficha
               </button>
             </td>
           </tr>
-          <!-- Ficha Desplegable de Licencias y Credenciales -->
-          <tr id="detalle-${idx}" class="hidden bg-slate-50 border-b border-slate-200">
+          <!-- Ficha Desplegable de Licencias, Credenciales y Acción de Actualizar -->
+          <tr id="detalle-${idx}" class="fila-detalle hidden bg-slate-50 border-b border-slate-200">
             <td colspan="7" class="p-4 text-xs text-slate-600">
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-lg border border-slate-200">
-                <div>
-                  <p class="font-bold text-alpina-primary mb-1">Credenciales Locales:</p>
-                  <p><strong>Usuario:</strong> ${item.usuarioLocal || 'Sin Dato'}</p>
-                  <p><strong>Contraseña:</strong> ${item.credencialesLocal || 'Sin Dato'}</p>
-                  <p><strong>Observaciones:</strong> ${item.observaciones || 'Ninguna'}</p>
+              <div class="bg-white p-4 rounded-lg border border-slate-200 shadow-sm space-y-4">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <p class="font-bold text-alpina-primary mb-1">Credenciales Locales:</p>
+                    <p><strong>Usuario:</strong> ${item.usuarioLocal || 'Sin Dato'}</p>
+                    <p><strong>Contraseña:</strong> ${item.credencialesLocal || 'Sin Dato'}</p>
+                    <p><strong>Observaciones:</strong> ${item.observaciones || 'Ninguna'}</p>
+                  </div>
+                  <div>
+                    <p class="font-bold text-alpina-primary mb-1">Licencias Registradas:</p>
+                    <p><strong>Windows:</strong> ${item.licencias?.windows || 'N/A'}</p>
+                    <p><strong>Office:</strong> ${item.licencias?.office || 'N/A'}</p>
+                    <p><strong>AutoCAD:</strong> ${item.licencias?.autocad || 'N/A'}</p>
+                  </div>
+                  <div>
+                    <p class="font-bold text-alpina-primary mb-1">Información Adicional:</p>
+                    <p><strong>Valor Compra:</strong> ${item.valorCompra || 'N/A'}</p>
+                    <p><strong>Adquisición:</strong> ${item.fechaAdquisicion || 'N/A'}</p>
+                    <p><strong>Segundo Uso:</strong> ${item.segundoUso || 'NO'}</p>
+                  </div>
                 </div>
-                <div>
-                  <p class="font-bold text-alpina-primary mb-1">Licencias Registradas:</p>
-                  <p><strong>Windows:</strong> ${item.licencias?.windows || 'N/A'}</p>
-                  <p><strong>Office:</strong> ${item.licencias?.office || 'N/A'}</p>
-                  <p><strong>AutoCAD:</strong> ${item.licencias?.autocad || 'N/A'}</p>
-                </div>
-                <div>
-                  <p class="font-bold text-alpina-primary mb-1">Información Adicional:</p>
-                  <p><strong>Valor Compra:</strong> ${item.valorCompra || 'N/A'}</p>
-                  <p><strong>Adquisición:</strong> ${item.fechaAdquisicion || 'N/A'}</p>
-                  <p><strong>Segundo Uso:</strong> ${item.segundoUso || 'NO'}</p>
+
+                <!-- Botón de Actualizar dentro de la Ficha Desplegable -->
+                <div class="pt-3 border-t border-slate-100 flex justify-end">
+                  <button onclick="abrirModalActualizar('${idx}')" class="px-4 py-2 bg-alpina-primary hover:bg-alpina-dark text-white text-xs font-semibold rounded-lg shadow transition-colors flex items-center gap-1.5">
+                    <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Actualizar Activo & Licencias
+                  </button>
                 </div>
               </div>
             </td>
@@ -214,13 +310,87 @@
       }
     }
 
-    // Toggle para mostrar/ocultar credenciales y licencias
+    // Modal Actualizar
+    function abrirModalActualizar(idx) {
+      const item = listaActivosGlobal[idx];
+      if (!item) return;
+
+      document.getElementById('activo-id').value = item.id || idx;
+      document.getElementById('activo-estado').value = item.estado || 'OPERATIVO';
+      document.getElementById('activo-usuario').value = item.usuarioAsignado || '';
+      document.getElementById('activo-ubicacion').value = item.ubicacion || '';
+      document.getElementById('activo-observaciones').value = item.observaciones || '';
+
+      // Precargar licencias existentes
+      document.getElementById('licencia-windows').value = item.licencias?.windows || '';
+      document.getElementById('licencia-office').value = item.licencias?.office || '';
+      document.getElementById('licencia-autocad').value = item.licencias?.autocad || '';
+
+      document.getElementById('modal-actualizar').classList.remove('hidden');
+    }
+
+    function cerrarModal() {
+      document.getElementById('modal-actualizar').classList.add('hidden');
+    }
+
+    async function guardarActualizacion(e) {
+      e.preventDefault();
+      const id = document.getElementById('activo-id').value;
+      const estado = document.getElementById('activo-estado').value;
+      const usuarioAsignado = document.getElementById('activo-usuario').value;
+      const ubicacion = document.getElementById('activo-ubicacion').value;
+      const observaciones = document.getElementById('activo-observaciones').value;
+
+      const licencias = {
+        windows: document.getElementById('licencia-windows').value,
+        office: document.getElementById('licencia-office').value,
+        autocad: document.getElementById('licencia-autocad').value
+      };
+
+      try {
+        const res = await fetch(`/api/activos/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ estado, usuarioAsignado, ubicacion, observaciones, licencias })
+        });
+
+        if (res.ok) {
+          cerrarModal();
+          cargarActivos();
+        } else {
+          alert('No se pudo actualizar el activo.');
+        }
+      } catch (err) {
+        console.error('Error al actualizar activo:', err);
+        alert('Error de conexión al actualizar.');
+      }
+    }
+
+    // Buscador omnicanal en vivo
+    function filtrarInventario() {
+      const busqueda = document.getElementById('input-buscar-inventario').value.toLowerCase().trim();
+      const filasPrincipal = document.querySelectorAll('.fila-activo');
+
+      filasPrincipal.forEach((fila) => {
+        const siguienteFilaDetalle = fila.nextElementSibling;
+        const textoFila = (fila.textContent + ' ' + (siguienteFilaDetalle ? siguienteFilaDetalle.textContent : '')).toLowerCase();
+
+        if (textoFila.includes(busqueda)) {
+          fila.style.display = '';
+        } else {
+          fila.style.display = 'none';
+          if (siguienteFilaDetalle && siguienteFilaDetalle.classList.contains('fila-detalle')) {
+            siguienteFilaDetalle.classList.add('hidden');
+          }
+        }
+      });
+    }
+
     function toggleDetalle(idx) {
       const el = document.getElementById(`detalle-${idx}`);
       if (el) el.classList.toggle('hidden');
     }
 
-    // 2. Eliminar todo el inventario anterior
     async function vaciarInventario() {
       if (!confirm('¿Deseas eliminar todos los registros actuales para subir la lista limpia desde el Excel?')) return;
 
@@ -238,7 +408,6 @@
       }
     }
 
-    // 3. Importar Excel a Firestore
     function procesarExcel(event) {
       const file = event.target.files[0];
       if (!file) return;

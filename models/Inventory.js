@@ -12,6 +12,22 @@ class InventoryModel {
     return items;
   }
 
+  // Actualizar activo por ID (incluye estado, usuario, ubicación, observaciones y licencias)
+  static async update(id, updateData) {
+    const docRef = db.collection('inventory_items').doc(id);
+    
+    // Si se envían licencias, las fusionamos con la estructura existente en Firestore
+    const dataToUpdate = {
+      ...updateData,
+      updatedAt: new Date().toISOString()
+    };
+
+    await docRef.set(dataToUpdate, { merge: true });
+    
+    const updatedDoc = await docRef.get();
+    return { id: updatedDoc.id, ...updatedDoc.data() };
+  }
+
   // Obtener alertas de stock bajo
   static async getLowStockAlerts() {
     const categoriesSnapshot = await db.collection('asset_categories').get();

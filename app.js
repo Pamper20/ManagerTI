@@ -158,7 +158,8 @@ async function obtenerTodosLosActivos() {
       nombreEquipo: data.nombreEquipo || '',
       empresa: data.empresa || 'ALPINA',
       ordenCompra: data.ordenCompra || '',
-      observaciones: data.observaciones || ''
+      observaciones: data.observaciones || '',
+      licencias: data.licencias || { windows: 'N/A', office: 'N/A', autocad: 'N/A' }
     });
   });
 
@@ -166,7 +167,6 @@ async function obtenerTodosLosActivos() {
   const snapshotInventario = await db.collection('inventario').get();
   snapshotInventario.forEach(doc => {
     const data = doc.data();
-    // Evitar duplicados por id
     if (!activos.some(a => a.id === doc.id)) {
       activos.push({
         id: doc.id,
@@ -182,7 +182,8 @@ async function obtenerTodosLosActivos() {
         nombreEquipo: data.nombreEquipo || '',
         empresa: data.empresa || 'ALPINA',
         ordenCompra: data.ordenCompra || '',
-        observaciones: data.observaciones || ''
+        observaciones: data.observaciones || '',
+        licencias: data.licencias || { windows: 'N/A', office: 'N/A', autocad: 'N/A' }
       });
     }
   });
@@ -210,6 +211,48 @@ app.get('/api/inventory', async (req, res) => {
   } catch (error) {
     console.error('Error al obtener inventario:', error);
     res.status(500).json({ error: 'Error al consultar inventario' });
+  }
+});
+
+// NUEVO: Actualizar activo y sus licencias en Firestore
+app.put('/api/activos/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estado, usuarioAsignado, ubicacion, observaciones, licencias } = req.body;
+
+    if (!id) {
+      return res.status(400).json({ error: 'Se requiere el ID del activo' });
+    }
+
+    const datosActualizados = {
+      estado: estado || 'OPERATIVO',
+      usuarioAsignado: usuarioAsignado || 'Sin Asignar',
+      ubicacion: ubicacion || 'Almacén',
+      observaciones: observaciones || '',
+      licencias: {
+        windows: licencias?.windows || 'N/A',
+        office: licencias?.office || 'N/A',
+        autocad: licencias?.autocad || 'N/A'
+      },
+      actualizadoEn: new Date().toISOString()
+    };
+
+    // Intentar actualizar en 'activos' primero, sino en 'inventario'
+    const docRefActivos = db.collection('activos').doc(id);
+    const docSnap = await docRefActivos.get();
+
+    if (docSnap.exists) {
+      await docRefActivos.update(datosActualizados);
+    } else {
+      await db.collection('inventario').doc(id).update(datosActualizados);
+    }
+
+    console.log(`[ACTIVOS] Activo ${id} actualizado correctamente.`);
+    res.json({ ok: true, mensaje: 'Activo y licencias actualizados exitosamente' });
+
+  } catch (error) {
+    console.error('Error al actualizar activo:', error);
+    res.status(500).json({ error: 'Error al guardar los cambios del activo' });
   }
 });
 
@@ -329,8 +372,8 @@ app.post('/api/activos/cargar-excel', async (req, res) => {
         
         licencias: {
           windows: getVal('LICENCIA WINDOWS', 'KEY WINDOWS') || 'De Fábrica / OEM',
-          office: getVal('LICENCIA OFFICE', 'KEY OFFICE') || '',
-          autocad: getVal('LICENCIA AUTOCAD') || '',
+          office: getVal('LICENCIA OFFICE', 'KEY OFFICE') || 'N/A',
+          autocad: getVal('LICENCIA AUTOCAD') || 'N/A',
           otras: getVal('OTRAS LICENCIAS') || ''
         },
 
