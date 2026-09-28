@@ -9,13 +9,24 @@ const db = require('./config/database');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middlewares
+// ==========================================
+// MIDDLEWARES DE PARSEO (DEBEN IR ANTES DE CUALQUIER RUTA)
+// ==========================================
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Servir archivos estáticos
 app.use(express.static(path.join(__dirname, 'views')));
 app.use(express.static(path.join(__dirname, 'public')));
+
+
+// ==========================================
+// RUTAS DE APIS
+// ==========================================
+
+// Registrar prefijo para el API de tareas (Ahora req.body sí estará definido)
+const taskRoutes = require('./routes/taskRoutes');
+app.use('/api/tareas', taskRoutes);
 
 
 // ==========================================

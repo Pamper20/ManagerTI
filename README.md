@@ -80,3 +80,8 @@ Backlog / Tareas Pendientes:
 
 [ ] Integrar el flujo de autenticación JWT usando jsonwebtoken y bcryptjs.
 
+### 📋 Módulo de Tareas Rutinarias y Checklist Diario (Nuevo) 28/09/2026
+- [x] **Modelo en Firestore**: Colección `tareas_rutinarias` para la gestión de tareas recurrentes por puesto o usuario.
+- [x] **Controlador & Rutas API**: Endpoints integrados en `controllers/taskController.js` y `routes/taskRoutes.js` para crear, consultar y marcar el estado de avance diario (`/api/tareas/toggle`).
+- [x] **Widget de Progreso en Dashboard**: Barra de avance dinámico (% de cumplimiento diario) con micro-interacciones visuales.
+- [x] **Módulo de Exportación**: Capacidad para descargar reportes de cumplimiento de tareas en formato Excel (`.xlsx`) y PDF directamente desde la interfaz.
